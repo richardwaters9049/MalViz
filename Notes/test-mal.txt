@@ -1,0 +1,3 @@
+--- Test Malware File ---
+This is a sample file to test file upload functionality.
+It is NOT a real malware file.
