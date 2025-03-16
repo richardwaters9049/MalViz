@@ -5,11 +5,19 @@ import { useState } from "react";
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
+  const [fileName, setFileName] = useState<string | null>(null);
 
   // Handle file selection
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] || null;
     setFile(selectedFile);
+
+    if (selectedFile) {
+      setFileName(selectedFile.name); // Set the file name to display
+    } else {
+      setFileName(null); // Clear the file name if no file is selected
+    }
+
     console.log("File selected:", selectedFile);
   };
 
@@ -55,7 +63,15 @@ export default function Home() {
           <input type="file" onChange={handleFileChange} className="hidden" />
         </label>
 
-        <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+        {/* Display the selected file name */}
+        {fileName && (
+          <p className="mt-2 text-gray-800">Selected file: {fileName}</p>
+        )}
+
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+        >
           Submit
         </button>
       </form>
