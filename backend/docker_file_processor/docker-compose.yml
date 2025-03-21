@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  file-processor:
+    build: .
+    container_name: file-processor-container
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads # Maps host directory to container
+    restart: unless-stopped
