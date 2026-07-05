@@ -1,0 +1,8 @@
+Observed sandbox-style indicators for a harmless MalViz fixture:
+
+URL: https://updates.example.test/checkin
+URL: http://cdn.example.invalid/payload
+Domain: suspicious-demo.example.test
+IP: 203.0.113.42
+IP: 198.51.100.17
+Email: analyst@example.test

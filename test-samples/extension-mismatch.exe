@@ -1,0 +1,4 @@
+This is plain text with an .exe extension.
+
+It is intentionally not a real executable. Uploading it helps test how MalViz
+handles metadata, extension review, and static-analysis reporting.

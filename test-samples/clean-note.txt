@@ -1,0 +1,4 @@
+This is a harmless MalViz test file.
+
+It contains ordinary text and should not include command execution strings,
+network indicators, binary headers, or encoded payload-looking data.

@@ -1,0 +1,7 @@
+This harmless fixture is designed to trigger suspicious static-analysis strings.
+
+powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIIIJJJJ
+cmd.exe /c whoami
+rundll32 example.dll,Start
+regsvr32 /s example.sct
+http://example.test/download

@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --background: #eef3f5;
+  --foreground: #172126;
+  --app-bg: #eef3f5;
+  --app-fg: #18181b;
+  --app-surface: #fbfcfd;
+  --app-surface-muted: #e7eef2;
+  --app-border: #d6e0e6;
+  --app-muted: #5f6f79;
+  --app-hero: #10232d;
+  --app-hero-soft: #17313d;
+  --app-hero-border: #244858;
+  --app-accent: #35c7dd;
+  --app-accent-soft: rgba(53, 199, 221, 0.13);
+  --app-accent-border: rgba(53, 199, 221, 0.35);
+  --app-table-head: #edf3f6;
+}
+
+[data-theme="dark"] {
+  --background: #06090d;
+  --foreground: #f8fafc;
+  --app-bg: #06090d;
+  --app-fg: #f8fafc;
+  --app-surface: #0d131a;
+  --app-surface-muted: #111923;
+  --app-border: #22303d;
+  --app-muted: #94a3b8;
+  --app-hero: #07111a;
+  --app-hero-soft: #0b1b26;
+  --app-hero-border: #183547;
+  --app-accent: #38e3ff;
+  --app-accent-soft: rgba(56, 227, 255, 0.13);
+  --app-accent-border: rgba(56, 227, 255, 0.42);
+  --app-table-head: #111923;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--app-fg);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+button,
+a,
+input,
+textarea {
+  letter-spacing: 0;
+}
+
+button:not(:disabled),
+a[href],
+label[for],
+select,
+summary,
+[role="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}

@@ -1,0 +1,5 @@
+This harmless fixture includes long base64-like strings for heuristic testing.
+
+QUFBQUJCQkJDQ0NDREREREVFRUVGRkZGR0dHR0hISEhJSUlJSkpKSkxMTE1NTU5OT09QUFBQUJCQkJDQ0ND
+U29tZVBvd2VyU2hlbGxMb29raW5nVGV4dGh0dHA6Ly9leGFtcGxlLnRlc3QvY2hlY2s=
+VGhpcyBpcyBub3QgbWFsd2FyZSBhbmQgaXMgb25seSBmb3IgTWFsVml6IHRlc3Rpbmcu
