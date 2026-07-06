@@ -129,7 +129,7 @@ export function LandingLogin({
                     Database setup needed
                   </div>
                   <p>
-                    Run `./.start` from the project root. It starts Postgres and Redis, applies Prisma
+                    Run `bun run setup` from the project root. It starts Postgres and Redis, applies Prisma
                     migrations, seeds the demo identities, starts the worker, and launches the app.
                   </p>
                 </motion.div>

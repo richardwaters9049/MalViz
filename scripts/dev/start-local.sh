@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT_DIR"
 
 APP_PORT="${PORT:-3000}"
 APP_URL="http://localhost:${APP_PORT}"
 LOG_DIR="$ROOT_DIR/.malviz"
 WORKER_LOG="$LOG_DIR/worker.log"
+COMPOSE_BASE="docker compose --project-directory $ROOT_DIR -f $ROOT_DIR/infra/docker/compose.yml"
 
 mkdir -p "$LOG_DIR"
 
@@ -101,16 +102,17 @@ bun install
 
 info "Starting Postgres and Redis with Docker Compose"
 info "This may pull Docker images on the first run."
-COMPOSE_PARALLEL_LIMIT="${COMPOSE_PARALLEL_LIMIT:-1}" docker compose up -d --wait --wait-timeout 240
+# The compose files live under infra/ so the repository root stays approachable on GitHub.
+COMPOSE_PARALLEL_LIMIT="${COMPOSE_PARALLEL_LIMIT:-1}" $COMPOSE_BASE up -d --wait --wait-timeout 240
 
-wait_for "Postgres" "docker compose exec -T postgres pg_isready -U malviz -d malviz"
-wait_for "Redis" "docker compose exec -T redis redis-cli ping | grep -q PONG"
+wait_for "Postgres" "$COMPOSE_BASE exec -T postgres pg_isready -U malviz -d malviz"
+wait_for "Redis" "$COMPOSE_BASE exec -T redis redis-cli ping | grep -q PONG"
 
 info "Generating Prisma client"
 bun run db:generate
 
 info "Applying database migrations"
-bunx prisma migrate deploy
+bunx prisma migrate deploy --config config/prisma.config.ts
 
 info "Seeding demo users"
 bun run db:seed

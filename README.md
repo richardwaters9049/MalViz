@@ -134,26 +134,27 @@ The report is intentionally explainable. MalViz should not claim a file is malic
 ## Repository Structure
 
 ```text
-app/
-  api/                 Next.js route handlers
-  dashboard/           dashboard page
-  upload/              upload page
-  scans/               scan history and report pages
-  admin/               administrator review page
-  settings/            runtime/account settings page
+src/
+  app/
+    api/               Next.js route handlers
+    dashboard/         dashboard page
+    upload/            upload page
+    scans/             scan history and report pages
+    admin/             administrator review page
+    settings/          runtime/account settings page
 
-components/
-  admin/               admin review components
-  dashboard/           dashboard components
-  layout/              shared shell and mobile navigation
-  scans/               report, verdict, indicator, and scan table components
-  upload/              upload dropzone
-  ui/                  shared UI primitives
+  components/
+    admin/             admin review components
+    dashboard/         dashboard components
+    layout/            shared shell and mobile navigation
+    scans/             report, verdict, indicator, and scan table components
+    upload/            upload dropzone
+    ui/                shared UI primitives
 
-lib/
-  db/                  Prisma client
-  security/            validation, rate limiting, and audit helpers
-  services/            upload, scan, storage, queue, report, and feedback services
+  lib/
+    db/                Prisma client
+    security/          validation, rate limiting, and audit helpers
+    services/          upload, scan, storage, queue, report, and feedback services
 
 prisma/
   schema.prisma        database schema
@@ -163,7 +164,13 @@ prisma/
 infra/
   docker/              Docker-only image definitions
 
+config/
+  eslint.config.mjs    lint configuration
+  prisma.config.ts     Prisma CLI configuration
+  vitest.config.ts     test runner configuration
+
 scripts/
+  dev/                 local startup scripts
   db/                  database verification helpers
   maintenance/         local maintenance tasks
 
@@ -224,7 +231,7 @@ Notes:
 From a fresh clone:
 
 ```bash
-./.start
+bun run setup
 ```
 
 This script:
@@ -272,7 +279,7 @@ bun run docker:dev:down
 Start infrastructure:
 
 ```bash
-docker compose up -d
+docker compose --project-directory . -f infra/docker/compose.yml up -d
 ```
 
 Install dependencies and prepare the database:
@@ -341,7 +348,7 @@ bun run lint
 bunx tsc --noEmit
 bun run test
 bun run test:python
-bunx prisma validate
+bunx prisma validate --config config/prisma.config.ts
 bun run build
 ```
 

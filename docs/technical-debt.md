@@ -8,7 +8,7 @@ Last reviewed: 2026-07-06
 - Soft-deleted quarantined files can be pruned with `bun run quarantine:prune`.
 - Scan reports now carry `report_schema_version`.
 - The legacy `worker/python/analyser/` package was removed after confirming it had no active imports.
-- Prisma seed configuration moved from deprecated `package.json#prisma` metadata to `prisma.config.ts`.
+- Prisma seed configuration moved from deprecated `package.json#prisma` metadata to `config/prisma.config.ts`.
 
 ## Remaining Strategic Work
 

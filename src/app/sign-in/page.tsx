@@ -53,7 +53,7 @@ export default async function SignInPage() {
                 <AlertTriangle className="h-4 w-4" aria-hidden />
                 Database setup needed
               </div>
-              <p>Run `./.start` from the project root to start services, migrate, seed demo users, and launch the app.</p>
+              <p>Run `bun run setup` from the project root to start services, migrate, seed demo users, and launch the app.</p>
             </div>
           ) : null}
           <form action={chooseUser} className="grid gap-3">

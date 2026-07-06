@@ -4,8 +4,8 @@ import { defineConfig } from "prisma/config";
 loadEnvConfig(process.cwd());
 
 export default defineConfig({
-  schema: "prisma/schema.prisma",
+  schema: "../prisma/schema.prisma",
   migrations: {
-    seed: "tsx prisma/seed.ts",
+    seed: "tsx ../prisma/seed.ts",
   },
 });
