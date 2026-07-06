@@ -17,7 +17,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "quarantine:prune": "tsx scripts/prune-quarantine.ts",
+    "quarantine:prune": "tsx scripts/maintenance/prune-quarantine.ts",
     "worker:python": "cd worker/python && . .venv/bin/activate && python main.py"
   },
   "dependencies": {

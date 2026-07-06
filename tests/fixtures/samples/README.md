@@ -8,4 +8,4 @@ These files are harmless text fixtures for exercising the upload and static-anal
 - `extension-mismatch.exe`: text content with an executable extension, useful for upload validation and file-type review.
 - `base64-heavy.txt`: contains long base64-like strings to trigger encoded-content heuristics.
 
-Upload one or more files from `/upload`, then watch `/results` for worker output.
+Upload one or more files from `/upload`, then watch `/scans` for worker output.

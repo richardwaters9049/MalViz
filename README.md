@@ -160,12 +160,21 @@ prisma/
   migrations/          database migrations
   seed.ts              demo users
 
+infra/
+  docker/              Docker-only image definitions
+
+scripts/
+  db/                  database verification helpers
+  maintenance/         local maintenance tasks
+
+tests/
+  fixtures/samples/    harmless files for manual upload testing
+  *.test.ts            TypeScript service and helper tests
+
 worker/python/
   main.py              worker entry point
   malviz_worker/       pipeline, plugins, scoring, reports, storage, and DB modules
   tests/               Python worker tests
-
-test-samples/          safe local fixtures for manual testing
 ```
 
 ## Prerequisites
@@ -338,8 +347,8 @@ bun run build
 
 Manual acceptance checks:
 
-- Upload `test-samples/clean-note.txt` and confirm it receives a low-risk result.
-- Upload `test-samples/suspicious-script.txt`, `test-samples/network-indicators.log`, or `test-samples/base64-heavy.txt` and confirm the report explains the suspicious signals.
+- Upload `tests/fixtures/samples/clean-note.txt` and confirm it receives a low-risk result.
+- Upload `tests/fixtures/samples/suspicious-script.txt`, `tests/fixtures/samples/network-indicators.log`, or `tests/fixtures/samples/base64-heavy.txt` and confirm the report explains the suspicious signals.
 - Confirm uploaded files are written under `MALVIZ_QUARANTINE_DIR`.
 - Confirm uploaded files are not written under `/public` or the Git project.
 - Confirm non-admin users only see their own scans.

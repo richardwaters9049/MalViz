@@ -116,7 +116,7 @@ info "Seeding demo users"
 bun run db:seed
 
 info "Verifying seeded demo login identities"
-bunx tsx scripts/verify-seed.ts
+bunx tsx scripts/db/verify-seed.ts
 
 if [[ ! -x worker/python/.venv/bin/python ]]; then
   info "Creating Python virtual environment"
