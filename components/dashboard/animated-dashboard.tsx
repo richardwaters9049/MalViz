@@ -81,7 +81,7 @@ export function AnimatedDashboard({
                 </Link>
               </Button>
               <Button variant="outline" asChild className="border-(--app-hero-border) bg-(--app-hero-soft) text-white hover:bg-violet-600">
-                <Link href="/results">Review results</Link>
+                <Link href="/scans">Review scans</Link>
               </Button>
             </motion.div>
           </div>
@@ -119,7 +119,7 @@ export function AnimatedDashboard({
           <CardHeader className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
             <CardTitle>Recent uploads</CardTitle>
             <Button variant="outline" size="sm" asChild>
-              <Link href="/results">View all</Link>
+              <Link href="/scans">View all</Link>
             </Button>
           </CardHeader>
           <CardContent>
@@ -147,7 +147,7 @@ export function AnimatedDashboard({
                         <td className="px-4 py-3">
                           <Link
                             className="block truncate font-medium text-(--app-fg) hover:text-cyan-700"
-                            href={`/results/${file.id}`}
+                            href={`/scans/${file.id}`}
                           >
                             {file.originalFilename}
                           </Link>
@@ -172,7 +172,7 @@ export function AnimatedDashboard({
                       <div className="min-w-0">
                         <Link
                           className="block truncate font-medium text-(--app-fg) hover:text-cyan-700"
-                          href={`/results/${file.id}`}
+                          href={`/scans/${file.id}`}
                         >
                           {file.originalFilename}
                         </Link>

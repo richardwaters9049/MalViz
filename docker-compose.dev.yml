@@ -26,6 +26,8 @@ services:
       REDIS_URL: redis://redis:6379
       APP_URL: http://localhost:3000
       SESSION_COOKIE_NAME: malviz_session
+      MALVIZ_QUARANTINE_DIR: /quarantine
+      MAX_UPLOAD_SIZE_MB: "25"
       MAX_UPLOAD_BYTES: "26214400"
       NEXT_TELEMETRY_DISABLED: "1"
       WATCHPACK_POLLING: "true"
@@ -36,6 +38,7 @@ services:
       - .:/app
       - bun-node-modules:/app/node_modules
       - next-cache:/app/.next
+      - quarantine-data:/quarantine
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -47,9 +50,11 @@ services:
     environment:
       DATABASE_URL: postgresql://malviz:malviz@postgres:5432/malviz?schema=public
       REDIS_URL: redis://redis:6379
+      MALVIZ_QUARANTINE_DIR: /quarantine
       WORKER_POLL_SECONDS: "2"
     volumes:
       - .:/app
+      - quarantine-data:/quarantine
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -57,3 +62,4 @@ services:
 volumes:
   bun-node-modules:
   next-cache:
+  quarantine-data:

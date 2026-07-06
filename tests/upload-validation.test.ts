@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inspectUpload, safeOriginalFilename } from "@/lib/validation/upload";
+import { inspectUpload, safeOriginalFilename } from "@/lib/security/file-validation";
 
 describe("upload validation", () => {
   it("sanitizes original filenames without using path segments", () => {
@@ -14,6 +14,8 @@ describe("upload validation", () => {
 
     expect(inspection.originalFilename).toBe("note.txt");
     expect(inspection.extension).toBe(".txt");
+    expect(inspection.md5).toHaveLength(32);
+    expect(inspection.sha1).toHaveLength(40);
     expect(inspection.sha256).toHaveLength(64);
     expect(inspection.warnings).toEqual([]);
   });

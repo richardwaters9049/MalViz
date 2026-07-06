@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth/session";
-import { prisma } from "@/lib/db/prisma";
+import { apiData, apiError } from "@/lib/services/api-response";
+import { getScanDetail } from "@/lib/services/scans/scan-service";
 
 export const runtime = "nodejs";
 
@@ -9,28 +9,13 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ) {
   const user = await requireUser();
-  const { id } = await context.params;
 
-  const scan = await prisma.file.findFirst({
-    where: {
-      id,
-      ...(user.role === "ADMIN" ? {} : { userId: user.id }),
-    },
-    include: {
-      user: { select: { id: true, name: true, email: true } },
-      scanJobs: { orderBy: { createdAt: "desc" }, take: 5 },
-      scanResult: true,
-      indicators: true,
-      feedback: {
-        include: { user: { select: { id: true, name: true, email: true } } },
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  });
+  try {
+    const { id } = await context.params;
+    const scan = await getScanDetail(user, id);
 
-  if (!scan) {
-    return NextResponse.json({ error: "Scan not found." }, { status: 404 });
+    return apiData({ scan });
+  } catch (error) {
+    return apiError(error);
   }
-
-  return NextResponse.json({ scan });
 }

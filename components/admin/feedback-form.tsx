@@ -50,7 +50,7 @@ export function FeedbackForm({ fileId }: { fileId: string }) {
       <select
         value={label}
         onChange={(event) => setLabel(event.currentTarget.value)}
-        className="h-10 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-950 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+        className="h-10 w-full rounded-md border border-(--app-border) bg-(--app-surface) px-3 text-sm text-(--app-fg) shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
       >
         {labels.map((option) => (
           <option key={option.value} value={option.value}>

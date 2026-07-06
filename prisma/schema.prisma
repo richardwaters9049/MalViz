@@ -77,6 +77,8 @@ model File {
   user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   originalFilename String       @map("original_filename")
   storedFilename   String       @unique @map("stored_filename")
+  md5              String?
+  sha1             String?
   sha256           String
   mimeType         String       @map("mime_type")
   fileSize         Int          @map("file_size")
@@ -121,6 +123,8 @@ model ScanResult {
   staticFindings     Json     @default("{}") @map("static_findings")
   dynamicFindings    Json     @default("{}") @map("dynamic_findings")
   recommendedActions Json     @default("[]") @map("recommended_actions")
+  rawReportJson      Json     @default("{}") @map("raw_report_json")
+  reportSchemaVersion Int     @default(1) @map("report_schema_version")
   createdAt          DateTime @default(now()) @map("created_at")
 
   @@map("scan_results")

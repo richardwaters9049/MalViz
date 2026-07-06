@@ -2,7 +2,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { UploadDropzone } from "@/components/upload/upload-dropzone";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireUser } from "@/lib/auth/session";
-import { maxUploadBytes } from "@/lib/validation/upload";
+import { maxUploadBytes } from "@/lib/security/file-validation";
 
 export const dynamic = "force-dynamic";
 
@@ -12,8 +12,8 @@ export default async function UploadPage() {
   return (
     <AppShell user={user}>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-zinc-950">Upload files</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className="text-2xl font-semibold text-(--app-fg)">Upload files</h1>
+        <p className="mt-1 text-sm text-(--app-muted)">
           Queue one or many files for static analysis. Samples are isolated in local quarantine storage.
         </p>
       </div>

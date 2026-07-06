@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -12,13 +13,21 @@
 
 # testing
 /coverage
+/.pytest_cache/
+/worker/python/.pytest_cache/
+.pytest_cache/
 
 # next.js
 /.next/
+.next/
 /out/
 
 # production
 /build
+/build/
+/dist/
+dist/
+build/
 
 # misc
 .DS_Store
@@ -38,11 +47,16 @@ yarn-error.log*
 /storage/quarantine/
 /storage/tmp/
 /.malviz/
+malviz-quarantine/
 
 # python worker
 /worker/python/.venv/
+/worker/python/.venv/**
 /worker/python/__pycache__/
+__pycache__/
+**/__pycache__/
 *.pyc
+**/*.pyc
 
 # vercel
 .vercel

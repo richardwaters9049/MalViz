@@ -12,14 +12,13 @@
     "docker:dev:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
     "lint": "eslint",
     "test": "vitest run",
+    "test:python": "cd worker/python && PYTHONPATH=. python3 -m pytest tests -q",
     "test:watch": "vitest",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "quarantine:prune": "tsx scripts/prune-quarantine.ts",
     "worker:python": "cd worker/python && . .venv/bin/activate && python main.py"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "6.19.1",

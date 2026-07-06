@@ -28,6 +28,7 @@ export function UploadDropzone({ maxBytes }: { maxBytes: number }) {
   const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [failures, setFailures] = useState<UploadResponse["failures"]>([]);
 
   function addFiles(fileList: FileList | null) {
     if (!fileList) return;
@@ -53,9 +54,11 @@ export function UploadDropzone({ maxBytes }: { maxBytes: number }) {
       const payload = (await response.json()) as UploadResponse;
 
       if (!response.ok) {
+        setFailures(payload.failures ?? []);
         throw new Error(payload.failures?.[0]?.error ?? "Upload failed.");
       }
 
+      setFailures(payload.failures);
       if (payload.failures.length > 0) {
         toast.warning(`${payload.failures.length} file(s) were rejected.`);
       }
@@ -63,7 +66,7 @@ export function UploadDropzone({ maxBytes }: { maxBytes: number }) {
       if (payload.uploads.length > 0) {
         toast.success(`${payload.uploads.length} file(s) queued for analysis.`);
         const firstUpload = payload.uploads[0];
-        router.push(`/results/${firstUpload.fileId}`);
+        router.push(`/scans/${firstUpload.fileId}`);
       }
 
       setProgress(100);
@@ -118,23 +121,36 @@ export function UploadDropzone({ maxBytes }: { maxBytes: number }) {
       </div>
 
       {files.length > 0 ? (
-        <div className="rounded-lg border border-zinc-200 bg-white">
-          <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
-            <p className="text-sm font-medium text-zinc-950">{files.length} selected file(s)</p>
+        <div className="rounded-lg border border-(--app-border) bg-(--app-surface)">
+          <div className="flex items-center justify-between border-b border-(--app-border) px-4 py-3">
+            <p className="text-sm font-medium text-(--app-fg)">{files.length} selected file(s)</p>
             <Button onClick={uploadFiles} disabled={isUploading}>
               {isUploading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <UploadCloud className="h-4 w-4" aria-hidden />}
               Queue analysis
             </Button>
           </div>
-          <ul className="divide-y divide-zinc-100">
+          <ul className="divide-y divide-(--app-border)">
             {files.map((file) => (
               <li key={`${file.name}-${file.size}-${file.lastModified}`} className="flex items-center justify-between gap-4 px-4 py-3 text-sm">
-                <span className="truncate font-medium text-zinc-800">{file.name}</span>
-                <span className="shrink-0 text-zinc-500">{formatBytes(file.size)}</span>
+                <span className="truncate font-medium text-(--app-fg)">{file.name}</span>
+                <span className="shrink-0 text-(--app-muted)">{formatBytes(file.size)}</span>
               </li>
             ))}
           </ul>
           {progress > 0 ? <Progress value={progress} className="rounded-none" /> : null}
+        </div>
+      ) : null}
+
+      {failures.length > 0 ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-medium text-red-800">Rejected files</p>
+          <ul className="mt-2 space-y-1 text-sm text-red-700">
+            {failures.map((failure) => (
+              <li key={`${failure.filename}-${failure.error}`}>
+                {failure.filename}: {failure.error}
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
     </div>
