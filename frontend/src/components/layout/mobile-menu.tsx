@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, Menu, X, LayoutDashboard, UploadCloud, ListChecks, Settings, type LucideIcon } from "lucide-react";
+import { LogOut, LayoutDashboard, UploadCloud, ListChecks, Settings, ShieldCheck, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -22,15 +22,80 @@ const iconMap: Record<string, LucideIcon> = {
   UploadCloud,
   ListChecks,
   Settings,
+  ShieldCheck,
 };
+
+function AnimatedBurgerIcon({ open }: { open: boolean }) {
+  return (
+    <span className="relative block h-5 w-5" aria-hidden>
+      <span
+        className={cn(
+          "absolute left-1/2 top-[4px] h-0.5 w-5 -translate-x-1/2 rounded-full bg-current transition-[top,transform,background-color] duration-300 ease-out",
+          open && "top-1/2 -translate-y-1/2 rotate-45 bg-cyan-500",
+        )}
+      />
+      <span
+        className={cn(
+          "absolute left-1/2 top-1/2 h-0.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current transition-[opacity,transform] duration-200 ease-out",
+          open && "scale-x-0 opacity-0",
+        )}
+      />
+      <span
+        className={cn(
+          "absolute left-1/2 bottom-[4px] h-0.5 w-5 -translate-x-1/2 rounded-full bg-current transition-[bottom,transform,background-color] duration-300 ease-out",
+          open && "bottom-1/2 translate-y-1/2 -rotate-45 bg-cyan-500",
+        )}
+      />
+      <span
+        className={cn(
+          "absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400 opacity-0 shadow-[0_0_14px_rgba(34,211,238,0.9)] transition-[opacity,transform] duration-300 ease-out",
+          open && "scale-100 opacity-100",
+          !open && "scale-0",
+        )}
+      />
+    </span>
+  );
+}
 
 export function MobileMenu({ navItems, userName, userEmail, userRole, logoutAction }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const closeTimerRef = useRef<number | null>(null);
   const pathname = usePathname();
   const titleId = useId();
 
+  const openMenu = useCallback(() => {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+
+    setIsMounted(true);
+    window.requestAnimationFrame(() => setIsOpen(true));
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setIsOpen(false);
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+
+    // Keep the drawer mounted briefly so the icon and panel can play their exit animation.
+    closeTimerRef.current = window.setTimeout(() => {
+      setIsMounted(false);
+    }, 260);
+  }, []);
+
+  const toggleMenu = useCallback(() => {
+    if (isOpen) {
+      closeMenu();
+      return;
+    }
+
+    openMenu();
+  }, [closeMenu, isOpen, openMenu]);
+
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isMounted) return;
 
     const originalOverflow = document.body.style.overflow;
     // Lock the page behind the drawer so touch scrolling stays inside the menu.
@@ -38,7 +103,7 @@ export function MobileMenu({ navItems, userName, userEmail, userRole, logoutActi
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setIsOpen(false);
+        closeMenu();
       }
     }
 
@@ -47,36 +112,53 @@ export function MobileMenu({ navItems, userName, userEmail, userRole, logoutActi
       document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen]);
+  }, [closeMenu, isMounted]);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <>
       <Button
         variant="ghost"
-        size="sm"
-        onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden"
+        size="icon"
+        onClick={toggleMenu}
+        className={cn(
+          "relative overflow-hidden md:hidden transition-[background-color,transform] duration-300 ease-out",
+          isOpen && "rotate-90 bg-(--app-surface-muted)",
+        )}
         aria-controls="mobile-navigation"
         aria-expanded={isOpen}
-        aria-label="Open navigation menu"
+        aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
       >
-        <Menu className="h-5 w-5" />
+        <AnimatedBurgerIcon open={isOpen} />
       </Button>
 
-      {isOpen && (
+      {isMounted && (
         <div className="fixed inset-0 z-50 md:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-black/45"
+            className={cn(
+              "absolute inset-0 bg-black/45 transition-opacity duration-200 ease-out",
+              isOpen ? "opacity-100" : "opacity-0",
+            )}
             aria-label="Close navigation menu"
-            onClick={() => setIsOpen(false)}
+            onClick={closeMenu}
           />
           <aside
             id="mobile-navigation"
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="absolute right-0 top-0 flex h-full w-full max-w-sm flex-col border-l border-(--app-border) bg-(--app-surface) shadow-2xl"
+            className={cn(
+              "absolute right-0 top-0 flex h-full w-full max-w-sm flex-col border-l border-(--app-border) bg-(--app-surface) shadow-2xl transition-[opacity,transform] duration-300 ease-out",
+              isOpen ? "translate-x-0 opacity-100" : "translate-x-8 opacity-0",
+            )}
           >
             <div className="flex items-start justify-between gap-3 border-b border-(--app-border) px-4 py-4">
               <div className="min-w-0">
@@ -89,11 +171,12 @@ export function MobileMenu({ navItems, userName, userEmail, userRole, logoutActi
               </div>
               <Button
                 variant="ghost"
-                size="sm"
-                onClick={() => setIsOpen(false)}
+                size="icon"
+                onClick={closeMenu}
+                className="relative overflow-hidden"
                 aria-label="Close menu"
               >
-                <X className="h-5 w-5" />
+                <AnimatedBurgerIcon open={isOpen} />
               </Button>
             </div>
 
@@ -110,9 +193,9 @@ export function MobileMenu({ navItems, userName, userEmail, userRole, logoutActi
                     asChild
                     className={cn(
                       "h-12 justify-start text-base",
-                      isActive && "bg-[var(--app-surface-muted)]",
+                      isActive && "bg-(--app-surface-muted)",
                     )}
-                    onClick={() => setIsOpen(false)}
+                    onClick={closeMenu}
                   >
                     <Link href={item.href}>
                       <Icon className="h-5 w-5" aria-hidden />

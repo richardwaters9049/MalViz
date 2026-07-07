@@ -1,6 +1,6 @@
 export type UploadSuccess = {
   fileId: string;
-  scanJobId: string;
+  scanJobId?: string | null;
   originalFilename: string;
   status: string;
   warnings: string[];

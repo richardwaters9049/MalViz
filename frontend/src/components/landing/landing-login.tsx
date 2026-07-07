@@ -82,7 +82,7 @@ export function LandingLogin({
             Upload suspicious files and get clear, actionable verdicts.
           </motion.h1>
           <motion.p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300" variants={item}>
-            MalViz stores files in quarantine, queues static analysis, and turns low-level signals into
+            MalViz stores files in quarantine, runs static analysis on demand, and turns low-level signals into
             reports analysts can actually act on.
           </motion.p>
 

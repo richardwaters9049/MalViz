@@ -14,12 +14,12 @@ export default async function UploadPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-(--app-fg)">Upload files</h1>
         <p className="mt-1 text-sm text-(--app-muted)">
-          Queue one or many files for static analysis. Samples are isolated in local quarantine storage.
+          Quarantine one or many files, then scan each file when you are ready to generate its report.
         </p>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>New analysis</CardTitle>
+          <CardTitle>New upload</CardTitle>
         </CardHeader>
         <CardContent>
           <UploadDropzone maxBytes={maxUploadBytes} />

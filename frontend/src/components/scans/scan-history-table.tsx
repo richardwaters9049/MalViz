@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { FileText } from "lucide-react";
 import { ScanStatusBadge } from "@/components/scans/scan-status-badge";
 import { VerdictBadge } from "@/components/scans/verdict-badge";
+import { Button } from "@/components/ui/button";
 import { formatBytes } from "@/lib/utils";
 
 type ScanRow = {
@@ -34,6 +36,7 @@ export function ScanHistoryTable({ scans }: { scans: ScanRow[] }) {
             <th className="px-4 py-3">Status</th>
             <th className="px-4 py-3">Verdict</th>
             <th className="px-4 py-3">Score</th>
+            <th className="px-4 py-3">Report</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-(--app-border)">
@@ -54,6 +57,14 @@ export function ScanHistoryTable({ scans }: { scans: ScanRow[] }) {
                 <VerdictBadge verdict={scan.scanResult?.verdict} />
               </td>
               <td className="px-4 py-3 text-(--app-muted)">{scan.scanResult?.riskScore ?? "-"}</td>
+              <td className="px-4 py-3">
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/scans/${scan.id}`}>
+                    <FileText className="h-4 w-4" aria-hidden />
+                    View report
+                  </Link>
+                </Button>
+              </td>
             </tr>
           ))}
         </tbody>

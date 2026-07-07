@@ -69,7 +69,7 @@ User
      -> displays status, verdict, score, reasons, indicators, and actions
 ```
 
-Next.js is responsible for the user experience, authentication, upload validation, metadata storage, queue signalling, and report display. The Python worker is responsible for file analysis.
+Next.js is responsible for the user experience, authentication, upload validation, metadata storage, manual scan queueing, and report display. The Python worker is responsible for file analysis.
 
 Raw uploaded files are written to `MALVIZ_QUARANTINE_DIR`, not to the application repository, not to `frontend/public`, and not to PostgreSQL.
 
@@ -294,11 +294,12 @@ bun run worker:python
 2. Choose one of the seeded demo users.
 3. Go to `/upload`.
 4. Upload one or more files.
-5. MalViz validates the file metadata, writes the bytes to quarantine storage, stores metadata in PostgreSQL, and creates a scan job.
-6. The Python worker claims queued jobs and runs static-analysis plugins.
-7. Go to `/scans` to view scan history.
-8. Open a scan detail page to review verdict, score, reasons, indicators, suggested actions, and technical details.
-9. Admin users can go to `/admin` to review suspicious, malicious, unknown, or failed scans and add feedback notes.
+5. MalViz validates the file metadata, writes the bytes to quarantine storage, and stores metadata in PostgreSQL.
+6. Open the scan detail page and choose `Scan now` when you are ready to generate the report.
+7. The Python worker claims the queued job and runs static-analysis plugins.
+8. Go to `/scans` to view scan history.
+9. Open a scan detail page to review verdict, score, reasons, indicators, suggested actions, and technical details.
+10. Admin users can go to `/admin` to review suspicious, malicious, unknown, or failed scans and add feedback notes.
 
 Useful routes:
 
@@ -364,7 +365,7 @@ MalViz currently has:
 - thin API routes backed by service modules
 - external quarantine storage
 - PostgreSQL metadata and structured reports
-- Redis/BullMQ upload-side queue signalling
+- Redis/BullMQ scan queue signalling from the manual scan action
 - a Python static-analysis worker
 - modular worker plugins for hashing, file type detection, strings, entropy, and indicator extraction
 - explainable risk scoring

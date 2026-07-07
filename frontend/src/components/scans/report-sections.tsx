@@ -35,7 +35,7 @@ export function ReportSections({
         </CardHeader>
         <CardContent>
           <p className="text-sm text-(--app-muted)">
-            The worker has not written a report yet. This page refreshes while a scan is active.
+            Start a scan to generate this report. Once analysis is active, this page refreshes automatically.
           </p>
         </CardContent>
       </Card>
@@ -45,7 +45,7 @@ export function ReportSections({
   const reasons = asStringArray(result.reasons);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
+    <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr] scan-result-grid">
       <Card>
         <CardHeader>
           <CardTitle>Why this verdict?</CardTitle>

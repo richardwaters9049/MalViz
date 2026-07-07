@@ -11,7 +11,7 @@ import { formatBytes } from "@/lib/utils";
 type UploadResponse = {
   uploads: Array<{
     fileId: string;
-    scanJobId: string;
+    scanJobId?: string | null;
     originalFilename: string;
     status: string;
     warnings: string[];
@@ -64,7 +64,7 @@ export function UploadDropzone({ maxBytes }: { maxBytes: number }) {
       }
 
       if (payload.uploads.length > 0) {
-        toast.success(`${payload.uploads.length} file(s) queued for analysis.`);
+        toast.success(`${payload.uploads.length} file(s) quarantined and ready to scan.`);
         const firstUpload = payload.uploads[0];
         router.push(`/scans/${firstUpload.fileId}`);
       }
@@ -126,7 +126,7 @@ export function UploadDropzone({ maxBytes }: { maxBytes: number }) {
             <p className="text-sm font-medium text-(--app-fg)">{files.length} selected file(s)</p>
             <Button onClick={uploadFiles} disabled={isUploading}>
               {isUploading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <UploadCloud className="h-4 w-4" aria-hidden />}
-              Queue analysis
+              Upload to quarantine
             </Button>
           </div>
           <ul className="divide-y divide-(--app-border)">

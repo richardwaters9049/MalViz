@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogOut, LayoutDashboard, UploadCloud, ListChecks, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, UploadCloud, ListChecks, Settings, ShieldCheck } from "lucide-react";
 import { Role } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ export function AppShell({
 }) {
   const allNavItems =
     user.role === Role.ADMIN
-      ? [...navItems, { href: "/admin", label: "Admin", iconName: "Settings" }]
+      ? [...navItems, { href: "/admin", label: "Admin", iconName: "ShieldCheck" }]
       : navItems;
 
   async function logout() {
@@ -57,7 +57,8 @@ export function AppShell({
               const Icon = item.iconName === "LayoutDashboard" ? LayoutDashboard
                 : item.iconName === "UploadCloud" ? UploadCloud
                   : item.iconName === "ListChecks" ? ListChecks
-                    : Settings;
+                    : item.iconName === "ShieldCheck" ? ShieldCheck
+                      : Settings;
               return (
                 <Button key={item.href} variant="ghost" size="sm" asChild>
                   <Link href={item.href}>

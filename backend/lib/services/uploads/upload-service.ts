@@ -1,9 +1,8 @@
-import { FileStatus, JobStatus, type Prisma } from "@prisma/client";
+import { FileStatus, type Prisma } from "@prisma/client";
 import type { SessionUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { enforceRateLimit, uploadRateLimitKey } from "@/lib/security/rate-limit";
 import { ServiceError } from "@/lib/services/errors";
-import { enqueueScanJob } from "@/lib/services/queue/scan-queue";
 import { removeQuarantineFile, writeQuarantineFile } from "@/lib/services/storage/quarantine-storage";
 import { inspectUpload } from "@/lib/services/uploads/upload-validation";
 import type { UploadFailure, UploadResult, UploadSuccess } from "@/lib/services/uploads/upload-types";
@@ -52,14 +51,7 @@ export async function handleUpload(request: Request, user: SessionUser): Promise
             mimeType: inspection.detectedMime,
             fileSize: bytes.byteLength,
             storagePath: stored.storagePath,
-            status: FileStatus.QUEUED,
-          },
-        });
-
-        const scanJob = await tx.scanJob.create({
-          data: {
-            fileId: fileRecord.id,
-            status: JobStatus.QUEUED,
+            status: FileStatus.UPLOADED,
           },
         });
 
@@ -77,33 +69,21 @@ export async function handleUpload(request: Request, user: SessionUser): Promise
           },
         });
 
-        return { fileRecord, scanJob };
+        return { fileRecord };
       });
 
       const warnings = [...inspection.warnings];
-      try {
-        await enqueueScanJob({
-          scanJobId: created.scanJob.id,
-          fileId: created.fileRecord.id,
-          storagePath: stored.storagePath,
-        });
-      } catch (queueError) {
-        warnings.push(
-          "Redis enqueue failed, but the scan job is safely queued in PostgreSQL for the Python worker.",
-        );
-        console.error("Failed to enqueue BullMQ scan job", queueError);
-      }
 
       uploads.push({
         fileId: created.fileRecord.id,
-        scanJobId: created.scanJob.id,
+        scanJobId: null,
         originalFilename: created.fileRecord.originalFilename,
         status: created.fileRecord.status,
         warnings,
       });
     } catch (error) {
       if (storagePath) {
-        // If the database or queue phase fails, delete the orphaned quarantined sample.
+        // If persistence fails after quarantine write, delete the orphaned sample.
         await removeQuarantineFile(storagePath);
       }
 
