@@ -15,11 +15,13 @@
 /coverage
 /.pytest_cache/
 /worker/python/.pytest_cache/
+/backend/worker/python/.pytest_cache/
 .pytest_cache/
 
 # next.js
 /.next/
 .next/
+/frontend/.next/
 /out/
 
 # production
@@ -53,6 +55,9 @@ malviz-quarantine/
 /worker/python/.venv/
 /worker/python/.venv/**
 /worker/python/__pycache__/
+/backend/worker/python/.venv/
+/backend/worker/python/.venv/**
+/backend/worker/python/__pycache__/
 __pycache__/
 **/__pycache__/
 *.pyc
@@ -64,3 +69,4 @@ __pycache__/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+frontend/next-env.d.ts

@@ -7,7 +7,7 @@ Last reviewed: 2026-07-06
 - Upload rate limiting now uses Redis when `REDIS_URL` is available, with in-memory limiting only as a local fallback.
 - Soft-deleted quarantined files can be pruned with `bun run quarantine:prune`.
 - Scan reports now carry `report_schema_version`.
-- The legacy `worker/python/analyser/` package was removed after confirming it had no active imports.
+- The legacy `backend/worker/python/analyser/` package was removed after confirming it had no active imports.
 - Prisma seed configuration moved from deprecated `package.json#prisma` metadata to `config/prisma.config.ts`.
 
 ## Remaining Strategic Work

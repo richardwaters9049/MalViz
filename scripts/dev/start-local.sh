@@ -118,18 +118,18 @@ info "Seeding demo users"
 bun run db:seed
 
 info "Verifying seeded demo login identities"
-bunx tsx scripts/db/verify-seed.ts
+bunx tsx backend/scripts/db/verify-seed.ts
 
-if [[ ! -x worker/python/.venv/bin/python ]]; then
+if [[ ! -x backend/worker/python/.venv/bin/python ]]; then
   info "Creating Python virtual environment"
-  python3 -m venv worker/python/.venv
+  python3 -m venv backend/worker/python/.venv
 fi
 
 info "Installing Python worker dependencies"
-worker/python/.venv/bin/pip install -r worker/python/requirements.txt
+backend/worker/python/.venv/bin/pip install -r backend/worker/python/requirements.txt
 
 info "Starting Python analysis worker"
-worker/python/.venv/bin/python worker/python/main.py >"$WORKER_LOG" 2>&1 &
+backend/worker/python/.venv/bin/python backend/worker/python/main.py >"$WORKER_LOG" 2>&1 &
 WORKER_PID="$!"
 success "Worker started with PID ${WORKER_PID}; logs: ${WORKER_LOG}"
 

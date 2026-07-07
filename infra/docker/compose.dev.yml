@@ -2,7 +2,7 @@ services:
   migrate:
     image: oven/bun:1.3.14
     working_dir: /app
-    command: sh -lc "bun install && bun run db:generate && bunx prisma migrate deploy --config config/prisma.config.ts && bun run db:seed && bunx tsx scripts/db/verify-seed.ts"
+    command: sh -lc "bun install && bun run db:generate && bunx prisma migrate deploy --config config/prisma.config.ts && bun run db:seed && bunx tsx backend/scripts/db/verify-seed.ts"
     environment:
       DATABASE_URL: postgresql://malviz:malviz@postgres:5432/malviz?schema=public
       REDIS_URL: redis://redis:6379
@@ -38,7 +38,7 @@ services:
     volumes:
       - .:/app
       - bun-node-modules:/app/node_modules
-      - next-cache:/app/.next
+      - next-cache:/app/frontend/.next
       - quarantine-data:/quarantine
     depends_on:
       migrate:
@@ -47,7 +47,7 @@ services:
   worker:
     image: python:3.14-slim
     working_dir: /app
-    command: sh -lc "pip install -r worker/python/requirements.txt && python worker/python/main.py"
+    command: sh -lc "pip install -r backend/worker/python/requirements.txt && python backend/worker/python/main.py"
     environment:
       DATABASE_URL: postgresql://malviz:malviz@postgres:5432/malviz?schema=public
       REDIS_URL: redis://redis:6379

@@ -71,7 +71,7 @@ User
 
 Next.js is responsible for the user experience, authentication, upload validation, metadata storage, queue signalling, and report display. The Python worker is responsible for file analysis.
 
-Raw uploaded files are written to `MALVIZ_QUARANTINE_DIR`, not to the application repository, not to `/public`, and not to PostgreSQL.
+Raw uploaded files are written to `MALVIZ_QUARANTINE_DIR`, not to the application repository, not to `frontend/public`, and not to PostgreSQL.
 
 ## Tech Stack
 
@@ -134,32 +134,20 @@ The report is intentionally explainable. MalViz should not claim a file is malic
 ## Repository Structure
 
 ```text
-src/
-  app/
-    api/               Next.js route handlers
-    dashboard/         dashboard page
-    upload/            upload page
-    scans/             scan history and report pages
-    admin/             administrator review page
-    settings/          runtime/account settings page
+frontend/
+  src/
+    app/               Next.js App Router pages and API route shells
+    components/        UI, layout, upload, scan, and admin components
+  public/              static assets served by Next.js
+  next.config.ts       Next.js app configuration
+  postcss.config.mjs   frontend CSS pipeline configuration
 
-  components/
-    admin/             admin review components
-    dashboard/         dashboard components
-    layout/            shared shell and mobile navigation
-    scans/             report, verdict, indicator, and scan table components
-    upload/            upload dropzone
-    ui/                shared UI primitives
-
-  lib/
-    db/                Prisma client
-    security/          validation, rate limiting, and audit helpers
-    services/          upload, scan, storage, queue, report, and feedback services
-
-prisma/
-  schema.prisma        database schema
-  migrations/          database migrations
-  seed.ts              demo users
+backend/
+  lib/                 auth, Prisma client, services, security, reports, queues
+  prisma/              database schema, migrations, and seed data
+  scripts/             backend database and maintenance helpers
+  tests/               TypeScript service tests and safe upload fixtures
+  worker/python/       Python static-analysis worker, plugins, and pytest tests
 
 infra/
   docker/              Docker-only image definitions
@@ -171,17 +159,6 @@ config/
 
 scripts/
   dev/                 local startup scripts
-  db/                  database verification helpers
-  maintenance/         local maintenance tasks
-
-tests/
-  fixtures/samples/    harmless files for manual upload testing
-  *.test.ts            TypeScript service and helper tests
-
-worker/python/
-  main.py              worker entry point
-  malviz_worker/       pipeline, plugins, scoring, reports, storage, and DB modules
-  tests/               Python worker tests
 ```
 
 ## Prerequisites
@@ -222,7 +199,7 @@ Notes:
 - `MAX_UPLOAD_SIZE_MB` is preferred.
 - `MAX_UPLOAD_BYTES` remains supported for compatibility.
 - `MALVIZ_QUARANTINE_DIR` should point outside the Git project.
-- Do not use `/public`, the project directory, or any synced folder for quarantine storage.
+- Do not use `frontend/public`, the project directory, or any synced folder for quarantine storage.
 
 ## How To Run
 
@@ -294,9 +271,9 @@ bun run db:seed
 Create the Python worker environment:
 
 ```bash
-python3 -m venv worker/python/.venv
-source worker/python/.venv/bin/activate
-pip install -r worker/python/requirements.txt
+python3 -m venv backend/worker/python/.venv
+source backend/worker/python/.venv/bin/activate
+pip install -r backend/worker/python/requirements.txt
 ```
 
 Start the web app:
@@ -339,7 +316,7 @@ The older `/results` routes redirect to `/scans` for compatibility.
 
 ## Testing And Verification
 
-The Python test script uses `python3 -m pytest` with `PYTHONPATH` pointed at `worker/python`. Make sure `pytest` is available to your `python3` interpreter before running it. If you use a virtual environment, activate it first.
+The Python test script uses `python3 -m pytest` with `PYTHONPATH` pointed at `backend/worker/python`. Make sure `pytest` is available to your `python3` interpreter before running it. If you use a virtual environment, activate it first.
 
 Run the main checks:
 
@@ -354,10 +331,10 @@ bun run build
 
 Manual acceptance checks:
 
-- Upload `tests/fixtures/samples/clean-note.txt` and confirm it receives a low-risk result.
-- Upload `tests/fixtures/samples/suspicious-script.txt`, `tests/fixtures/samples/network-indicators.log`, or `tests/fixtures/samples/base64-heavy.txt` and confirm the report explains the suspicious signals.
+- Upload `backend/tests/fixtures/samples/clean-note.txt` and confirm it receives a low-risk result.
+- Upload `backend/tests/fixtures/samples/suspicious-script.txt`, `backend/tests/fixtures/samples/network-indicators.log`, or `backend/tests/fixtures/samples/base64-heavy.txt` and confirm the report explains the suspicious signals.
 - Confirm uploaded files are written under `MALVIZ_QUARANTINE_DIR`.
-- Confirm uploaded files are not written under `/public` or the Git project.
+- Confirm uploaded files are not written under `frontend/public` or the Git project.
 - Confirm non-admin users only see their own scans.
 - Confirm admin users can review suspicious, malicious, unknown, and failed scans.
 
