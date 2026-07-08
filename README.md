@@ -138,22 +138,26 @@ frontend/
   src/
     app/               Next.js App Router pages and API route shells
     components/        UI, layout, upload, scan, and admin components
-  public/              static assets served by Next.js
+  public/              optional static assets served by Next.js
   next.config.ts       Next.js app configuration
   postcss.config.mjs   frontend CSS pipeline configuration
 
 backend/
-  lib/                 auth, Prisma client, services, security, reports, queues
+  lib/                 auth, Prisma client, services, security, reports, storage, worker trigger
   prisma/              database schema, migrations, and seed data
   scripts/             backend database and maintenance helpers
   tests/               TypeScript service tests and safe upload fixtures
   worker/python/       Python static-analysis worker, plugins, and pytest tests
+
+e2e/
+  *.spec.ts            Playwright coverage for upload, scan, admin feedback, and mobile navigation
 
 infra/
   docker/              Docker-only image definitions
 
 config/
   eslint.config.mjs    lint configuration
+  playwright.config.ts browser e2e test configuration
   prisma.config.ts     Prisma CLI configuration
   vitest.config.ts     test runner configuration
 
