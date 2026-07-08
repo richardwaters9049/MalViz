@@ -9,6 +9,7 @@ It is intentionally conservative: uploaded samples are never executed, raw file 
 | Section | Description |
 | --- | --- |
 | [Project Aim](#project-aim) | What MalViz is trying to achieve. |
+| [Screenshots](#screenshots) | Where to view application screenshots. |
 | [Overview](#overview) | The main application flow and architecture. |
 | [Tech Stack](#tech-stack) | Frameworks, services, and runtime tools. |
 | [Expected Output](#expected-output) | What a completed scan report looks like. |
@@ -37,6 +38,10 @@ The project focuses on:
 - a codebase that can later support deeper detectors without a major rewrite
 
 MalViz is not a sandbox and does not dynamically execute malware. Dynamic analysis, sandboxing, machine learning, and external malware-sharing features are deliberately out of scope for the current MVP.
+
+## Screenshots
+
+Application screenshots are available in [screenshots/MalScreenShots](screenshots/MalScreenShots).
 
 ## Overview
 
