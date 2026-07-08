@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { formatBytes } from "@/lib/utils";
+import { apiFailureMessage, readJsonPayload } from "@/utils/api-error";
 
 type UploadResponse = {
   uploads: Array<{
@@ -20,6 +21,9 @@ type UploadResponse = {
     filename: string;
     error: string;
   }>;
+  error?: {
+    message?: string;
+  };
 };
 
 export function UploadDropzone({ maxBytes }: { maxBytes: number }) {
@@ -51,21 +55,23 @@ export function UploadDropzone({ maxBytes }: { maxBytes: number }) {
       });
       setProgress(85);
 
-      const payload = (await response.json()) as UploadResponse;
+      const payload = (await readJsonPayload(response)) as Partial<UploadResponse> | null;
+      const uploads = Array.isArray(payload?.uploads) ? payload.uploads : [];
+      const rejected = Array.isArray(payload?.failures) ? payload.failures : [];
 
       if (!response.ok) {
-        setFailures(payload.failures ?? []);
-        throw new Error(payload.failures?.[0]?.error ?? "Upload failed.");
+        setFailures(rejected);
+        throw new Error(apiFailureMessage(payload, "Upload failed."));
       }
 
-      setFailures(payload.failures);
-      if (payload.failures.length > 0) {
-        toast.warning(`${payload.failures.length} file(s) were rejected.`);
+      setFailures(rejected);
+      if (rejected.length > 0) {
+        toast.warning(`${rejected.length} file(s) were rejected.`);
       }
 
-      if (payload.uploads.length > 0) {
-        toast.success(`${payload.uploads.length} file(s) quarantined and ready to scan.`);
-        const firstUpload = payload.uploads[0];
+      if (uploads.length > 0) {
+        toast.success(`${uploads.length} file(s) quarantined and ready to scan.`);
+        const firstUpload = uploads[0];
         router.push(`/scans/${firstUpload.fileId}`);
       }
 

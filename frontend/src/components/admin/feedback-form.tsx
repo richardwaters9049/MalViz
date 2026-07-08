@@ -6,6 +6,7 @@ import { Loader2, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { apiFailureMessage, readJsonPayload } from "@/utils/api-error";
 
 const labels = [
   { value: "NEEDS_REVIEW", label: "Needs review" },
@@ -32,7 +33,8 @@ export function FeedbackForm({ fileId }: { fileId: string }) {
       });
 
       if (!response.ok) {
-        throw new Error("Could not save feedback.");
+        const payload = await readJsonPayload(response);
+        throw new Error(apiFailureMessage(payload, "Could not save feedback."));
       }
 
       toast.success("Feedback saved.");

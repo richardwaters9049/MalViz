@@ -6,10 +6,19 @@ import { Loader2, Radar, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { apiFailureMessage, readJsonPayload } from "@/utils/api-error";
 
 type ScanNowButtonProps = {
   fileId: string;
   status: string;
+};
+
+type ScanStartPayload = {
+  data?: {
+    scan?: {
+      warnings?: unknown;
+    };
+  };
 };
 
 const activeStatuses = new Set(["QUEUED", "SCANNING"]);
@@ -58,14 +67,15 @@ export function ScanNowButton({ fileId, status }: ScanNowButtonProps) {
       const response = await fetch(`/api/scans/${fileId}`, {
         method: "POST",
       });
-      const payload = await response.json();
+      const payload = await readJsonPayload(response);
 
       if (!response.ok) {
-        throw new Error(payload.error?.message ?? "Scan could not be started.");
+        throw new Error(apiFailureMessage(payload, "Scan could not be started."));
       }
 
-      const warnings = Array.isArray(payload.data?.scan?.warnings)
-        ? payload.data.scan.warnings.filter((warning: unknown): warning is string => typeof warning === "string")
+      const scanPayload = payload as ScanStartPayload | null;
+      const warnings = Array.isArray(scanPayload?.data?.scan?.warnings)
+        ? scanPayload.data.scan.warnings.filter((warning: unknown): warning is string => typeof warning === "string")
         : [];
 
       toast.success(status === "QUEUED" || status === "SCANNING"

@@ -1,6 +1,7 @@
 export type ServiceErrorCode =
   | "BAD_REQUEST"
   | "FORBIDDEN"
+  | "UNAUTHORIZED"
   | "NOT_FOUND"
   | "RATE_LIMITED"
   | "VALIDATION_FAILED"
@@ -11,6 +12,7 @@ export type ServiceErrorCode =
 const statusByCode: Record<ServiceErrorCode, number> = {
   BAD_REQUEST: 400,
   FORBIDDEN: 403,
+  UNAUTHORIZED: 401,
   NOT_FOUND: 404,
   RATE_LIMITED: 429,
   VALIDATION_FAILED: 422,

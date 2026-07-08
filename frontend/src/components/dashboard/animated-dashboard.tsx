@@ -115,7 +115,7 @@ export function AnimatedDashboard({
       </motion.div>
 
       <motion.div className="min-w-0" variants={item}>
-        <Card className="min-w-0 border(--app-border) bg-(--app-surface)]">
+        <Card className="min-w-0 border-(--app-border) bg-(--app-surface)">
           <CardHeader className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
             <CardTitle>Recent uploads</CardTitle>
             <Button variant="outline" size="sm" asChild>

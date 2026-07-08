@@ -50,5 +50,10 @@ export async function writeQuarantineFile(
 }
 
 export async function removeQuarantineFile(storagePath: string) {
-  await unlink(storagePath).catch(() => undefined);
+  try {
+    await unlink(storagePath);
+    return true;
+  } catch {
+    return false;
+  }
 }

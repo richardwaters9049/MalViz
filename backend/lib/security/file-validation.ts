@@ -2,15 +2,23 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileTypeFromBuffer } from "file-type";
 
-const defaultMaxBytes = 25 * 1024 * 1024;
+const defaultMaxUploadSizeMb = 25;
+const defaultMaxBytes = defaultMaxUploadSizeMb * 1024 * 1024;
 
-export const maxUploadSizeMb = Number(process.env.MAX_UPLOAD_SIZE_MB ?? "25");
+const configuredMaxUploadSizeMb = Number(
+  process.env.MAX_UPLOAD_SIZE_MB ?? defaultMaxUploadSizeMb,
+);
+
+export const maxUploadSizeMb =
+  Number.isFinite(configuredMaxUploadSizeMb) && configuredMaxUploadSizeMb > 0
+    ? configuredMaxUploadSizeMb
+    : defaultMaxUploadSizeMb;
 
 const configuredMaxUploadBytes = process.env.MAX_UPLOAD_BYTES
   ? Number(process.env.MAX_UPLOAD_BYTES)
   : maxUploadSizeMb * 1024 * 1024;
 
-export const maxUploadBytes = Number.isFinite(configuredMaxUploadBytes)
+export const maxUploadBytes = Number.isFinite(configuredMaxUploadBytes) && configuredMaxUploadBytes > 0
   ? configuredMaxUploadBytes
   : defaultMaxBytes;
 
@@ -90,11 +98,12 @@ export async function inspectUpload(
     detectedType?.mime || file.type || "application/octet-stream";
   const warnings: string[] = [];
 
-  if (file.size <= 0) {
+  // Use the materialized buffer for size checks so validation matches the bytes we store.
+  if (bytes.byteLength <= 0) {
     throw new Error("Empty files cannot be scanned.");
   }
 
-  if (file.size > maxUploadBytes) {
+  if (bytes.byteLength > maxUploadBytes) {
     throw new Error(`File exceeds the ${maxUploadBytes} byte upload limit.`);
   }
 

@@ -2,6 +2,7 @@ import { Role, type User } from "@prisma/client";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
+import { ServiceError } from "@/lib/services/errors";
 
 export const sessionCookieName =
   process.env.SESSION_COOKIE_NAME ?? "malviz_session";
@@ -37,6 +38,26 @@ export async function requireAdmin() {
 
   if (user.role !== Role.ADMIN) {
     redirect("/");
+  }
+
+  return user;
+}
+
+export async function requireApiUser() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    throw new ServiceError("UNAUTHORIZED", "Authentication is required.");
+  }
+
+  return user;
+}
+
+export async function requireApiAdmin() {
+  const user = await requireApiUser();
+
+  if (user.role !== Role.ADMIN) {
+    throw new ServiceError("FORBIDDEN", "Administrator access is required.");
   }
 
   return user;

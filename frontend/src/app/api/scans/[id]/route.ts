@@ -1,4 +1,4 @@
-import { requireUser } from "@/lib/auth/session";
+import { requireApiUser } from "@/lib/auth/session";
 import { apiData, apiError } from "@/lib/services/api-response";
 import { getScanDetail, startScan } from "@/lib/services/scans/scan-service";
 
@@ -8,9 +8,8 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const user = await requireUser();
-
   try {
+    const user = await requireApiUser();
     const { id } = await context.params;
     const scan = await getScanDetail(user, id);
 
@@ -24,9 +23,8 @@ export async function POST(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const user = await requireUser();
-
   try {
+    const user = await requireApiUser();
     const { id } = await context.params;
     const scan = await startScan(user, id);
 

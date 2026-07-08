@@ -181,6 +181,7 @@ export async function startScan(user: SessionUser, id: string) {
 
   const warnings = [...result.warnings];
 
+  // Redis is an acceleration path; PostgreSQL remains the durable queue for the Python worker.
   try {
     await enqueueScanJob({
       scanJobId: result.scanJob.id,
@@ -195,6 +196,7 @@ export async function startScan(user: SessionUser, id: string) {
   }
 
   if (result.shouldTriggerWorker) {
+    // In local development, kick a one-shot worker so users see reports without a daemon.
     const trigger = triggerWorkerOnce();
     if (!trigger.triggered) {
       warnings.push(trigger.warning ?? "Scan worker could not be started automatically.");

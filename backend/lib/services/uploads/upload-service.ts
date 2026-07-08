@@ -2,9 +2,9 @@ import { FileStatus, type Prisma } from "@prisma/client";
 import type { SessionUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { enforceRateLimit, uploadRateLimitKey } from "@/lib/security/rate-limit";
+import { inspectUpload } from "@/lib/security/file-validation";
 import { ServiceError } from "@/lib/services/errors";
 import { removeQuarantineFile, writeQuarantineFile } from "@/lib/services/storage/quarantine-storage";
-import { inspectUpload } from "@/lib/services/uploads/upload-validation";
 import type { UploadFailure, UploadResult, UploadSuccess } from "@/lib/services/uploads/upload-types";
 
 export async function handleUpload(request: Request, user: SessionUser): Promise<UploadResult> {
@@ -84,7 +84,10 @@ export async function handleUpload(request: Request, user: SessionUser): Promise
     } catch (error) {
       if (storagePath) {
         // If persistence fails after quarantine write, delete the orphaned sample.
-        await removeQuarantineFile(storagePath);
+        const removed = await removeQuarantineFile(storagePath);
+        if (!removed) {
+          console.warn("Could not remove orphaned quarantine file", { storagePath });
+        }
       }
 
       failures.push({

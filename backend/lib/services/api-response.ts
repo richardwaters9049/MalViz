@@ -7,6 +7,7 @@ export function apiData<T>(data: T, init?: ResponseInit) {
 
 export function apiError(error: unknown) {
   if (isServiceError(error)) {
+    // Service errors are expected failures, so keep their messages readable for clients.
     return NextResponse.json(
       {
         error: {

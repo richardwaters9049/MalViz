@@ -17,6 +17,7 @@ def connect():
 
 def claim_job(conn: psycopg.Connection) -> dict[str, Any] | None:
     with conn.transaction():
+        # SKIP LOCKED lets multiple workers poll safely without claiming the same queued job.
         row = conn.execute(
             """
             SELECT
