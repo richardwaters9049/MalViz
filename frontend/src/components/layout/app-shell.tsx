@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { LogOut, LayoutDashboard, UploadCloud, ListChecks, Settings, ShieldCheck } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Role } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { MobileMenu } from "@/components/layout/mobile-menu";
+import { DesktopNav } from "@/components/layout/desktop-nav";
 import { cn } from "@/lib/utils";
 import { clearSession, type SessionUser } from "@/lib/auth/session";
 
@@ -34,7 +35,7 @@ export function AppShell({
     "use server";
 
     await clearSession();
-    redirect("/");
+    redirect("/?skipIntro=1");
   }
 
   return (
@@ -52,23 +53,7 @@ export function AppShell({
             </div>
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
-            {allNavItems.map((item) => {
-              const Icon = item.iconName === "LayoutDashboard" ? LayoutDashboard
-                : item.iconName === "UploadCloud" ? UploadCloud
-                  : item.iconName === "ListChecks" ? ListChecks
-                    : item.iconName === "ShieldCheck" ? ShieldCheck
-                      : Settings;
-              return (
-                <Button key={item.href} variant="ghost" size="sm" asChild>
-                  <Link href={item.href}>
-                    <Icon className="h-4 w-4" aria-hidden />
-                    {item.label}
-                  </Link>
-                </Button>
-              );
-            })}
-          </nav>
+          <DesktopNav navItems={allNavItems} />
 
           <div className="flex items-center gap-2 sm:gap-3">
             <MobileMenu

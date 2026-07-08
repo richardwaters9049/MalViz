@@ -8,6 +8,10 @@ export type WorkerTriggerResult = {
 };
 
 export function triggerWorkerOnce(): WorkerTriggerResult {
+  if (process.env.MALVIZ_AUTO_TRIGGER_WORKER === "false") {
+    return { triggered: true };
+  }
+
   const root = process.cwd();
   const workerRoot = join(root, "backend/worker/python");
   const venvPython = join(workerRoot, ".venv/bin/python");

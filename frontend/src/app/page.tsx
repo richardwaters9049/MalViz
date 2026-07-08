@@ -6,10 +6,15 @@ import { getCurrentUser, setSession } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
-export default async function LandingPage() {
+export default async function LandingPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ skipIntro?: string }>;
+}) {
   let currentUser = null;
   let users: Array<{ id: string; email: string; name: string; role: Role }> = [];
   let databaseError: string | null = null;
+  const params = await searchParams;
 
   try {
     currentUser = await getCurrentUser();
@@ -44,6 +49,7 @@ export default async function LandingPage() {
       users={users}
       databaseError={databaseError}
       chooseUser={chooseUser}
+      skipIntro={params?.skipIntro === "1"}
     />
   );
 }

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import { Role } from "@prisma/client";
-import { AlertTriangle, ShieldCheck } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/db/prisma";
@@ -38,8 +39,15 @@ export default async function SignInPage() {
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-10">
       <Card className="w-full max-w-lg">
         <CardHeader>
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-950 text-white">
-            <ShieldCheck className="h-6 w-6" aria-hidden />
+          <div className="mb-4 flex justify-center">
+            <Image
+              src="/brand/malviz-logo-concept.png"
+              alt="MalViz logo"
+              width={168}
+              height={168}
+              priority
+              className="rounded-2xl border border-cyan-200 shadow-[0_18px_45px_rgba(8,145,178,0.18)]"
+            />
           </div>
           <CardTitle className="text-xl">Choose a demo role</CardTitle>
           <p className="text-sm text-zinc-500">

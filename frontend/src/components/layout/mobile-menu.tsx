@@ -192,12 +192,15 @@ export function MobileMenu({ navItems, userName, userEmail, userRole, logoutActi
                     size="lg"
                     asChild
                     className={cn(
-                      "h-12 justify-start text-base",
-                      isActive && "bg-(--app-surface-muted)",
+                      "h-12 justify-start text-base hover:bg-transparent hover:!text-(--app-accent)",
                     )}
                     onClick={closeMenu}
                   >
-                    <Link href={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={isActive ? "page" : undefined}
+                      style={isActive ? { color: "var(--app-accent)" } : undefined}
+                    >
                       <Icon className="h-5 w-5" aria-hidden />
                       {item.label}
                     </Link>

@@ -1,5 +1,7 @@
 # MalViz
 
+<img src="frontend/public/brand/malviz-logo-concept.png" alt="MalViz logo concept" width="280" />
+
 MalViz is a local-first malware analysis MVP for safely uploading suspicious files, quarantining them outside the application repository, running static analysis in a Python worker, and presenting clear, explainable scan reports to users and administrators.
 
 It is intentionally conservative: uploaded samples are never executed, raw file bytes are not stored in PostgreSQL, and the Next.js app does not perform malware analysis itself.
@@ -17,6 +19,7 @@ It is intentionally conservative: uploaded samples are never executed, raw file 
 | [Prerequisites](#prerequisites) | Tools needed for local development. |
 | [Environment](#environment) | Required configuration values. |
 | [How To Run](#how-to-run) | One-command, Docker, and manual setup options. |
+| [Free Online Hosting](#free-online-hosting) | How to deploy the portfolio demo on an Always Free VM. |
 | [Demo Login Options](#demo-login-options) | How seeded demo authentication works. |
 | [How To Use The Programme](#how-to-use-the-programme) | Uploading, scanning, reviewing, and administering files. |
 | [Testing And Verification](#testing-and-verification) | Commands for checking the project. |
@@ -92,6 +95,7 @@ Raw uploaded files are written to `MALVIZ_QUARANTINE_DIR`, not to the applicatio
 | Worker tests | pytest |
 | Frontend/backend tests | Vitest, Playwright, TypeScript, ESLint |
 | Local services | Docker Compose |
+| Portfolio hosting | Docker Compose production stack with Caddy |
 
 Docker Compose maps local services to non-default ports to avoid common conflicts:
 
@@ -158,7 +162,7 @@ e2e/
   *.spec.ts            Playwright coverage for upload, scan, admin feedback, and mobile navigation
 
 infra/
-  docker/              Docker-only image definitions
+  docker/              Docker image, Compose, Caddy, and env examples
 
 config/
   eslint.config.mjs    lint configuration
@@ -210,6 +214,7 @@ Notes:
 - `REDIS_URL` is used for upload rate limiting only; scan jobs are queued in PostgreSQL.
 - `MALVIZ_QUARANTINE_DIR` should point outside the Git project.
 - Do not use `frontend/public`, the project directory, or any synced folder for quarantine storage.
+- Production Docker hosting uses `infra/docker/prod.env`, copied from `infra/docker/prod.env.example`; keep the real `prod.env` private.
 
 ## How To Run
 
@@ -297,6 +302,74 @@ Start the worker in another terminal:
 ```bash
 bun run worker:python
 ```
+
+### Option 4: Production Docker stack
+
+For an online portfolio demo, use the production Docker stack:
+
+```bash
+cp infra/docker/prod.env.example infra/docker/prod.env
+bun run docker:prod
+```
+
+This starts:
+
+- Caddy on ports `80` and `443`
+- Next.js in production mode
+- PostgreSQL
+- Redis
+- Prisma migration and seed job
+- Python worker
+- persistent Docker volumes for PostgreSQL, Caddy data, and quarantine storage
+
+Stop it with:
+
+```bash
+bun run docker:prod:down
+```
+
+Follow logs with:
+
+```bash
+bun run docker:prod:logs
+```
+
+## Free Online Hosting
+
+The recommended free hosting path is an Oracle Cloud Always Free Ubuntu VM running the production Docker stack. This matches MalViz better than static or serverless hosting because the app needs PostgreSQL, Redis, shared quarantine storage, and a long-running Python worker.
+
+Use the full guide here:
+
+[docs/free-hosting-oracle.md](docs/free-hosting-oracle.md)
+
+Production hosting files:
+
+| File | Purpose |
+| --- | --- |
+| `infra/docker/compose.prod.yml` | Full production stack for web, worker, database, Redis, and Caddy. |
+| `infra/docker/Dockerfile.web` | Builds the Next.js production application image. |
+| `infra/docker/Dockerfile.worker` | Builds the Python scan worker image. |
+| `infra/docker/Caddyfile.prod` | Reverse proxy and automatic HTTPS configuration. |
+| `infra/docker/prod.env.example` | Template for private production settings. |
+
+For a real domain, set `APP_URL=https://your-domain.example` and `MALVIZ_SITE_ADDRESS=your-domain.example` in `infra/docker/prod.env`. Caddy will request HTTPS certificates automatically after DNS points to the VM.
+
+For a temporary HTTP-only demo by IP address, set `APP_URL=http://YOUR_VM_PUBLIC_IP` and `MALVIZ_SITE_ADDRESS=:80`.
+
+Important production variables:
+
+| Variable | Purpose |
+| --- | --- |
+| `POSTGRES_PASSWORD` | Long random database password used by the internal PostgreSQL service. |
+| `DATABASE_URL` | Built by Compose for app containers from the PostgreSQL settings. |
+| `REDIS_URL` | Set to `redis://redis:6379` inside the Docker network. |
+| `APP_URL` | Public URL used by the app. |
+| `SESSION_COOKIE_NAME` | Session cookie name, defaulting to `malviz_session`. |
+| `MALVIZ_QUARANTINE_DIR` | Set to `/quarantine` inside app and worker containers. |
+| `MALVIZ_AUTO_TRIGGER_WORKER` | Set to `false` in production Compose because the worker polls continuously. |
+| `MAX_UPLOAD_SIZE_MB` / `MAX_UPLOAD_BYTES` | Upload size limits for the demo. |
+
+Keep the online demo conservative: do not upload real malware, do not expose PostgreSQL or Redis publicly, and replace seeded demo auth before treating MalViz as a production application.
 
 ## Demo Login Options
 

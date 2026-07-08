@@ -1,7 +1,9 @@
 "use client";
 
-import { Activity, AlertTriangle, FileSearch, ShieldCheck, UploadCloud } from "lucide-react";
-import { motion, type Variants } from "framer-motion";
+import Image from "next/image";
+import { Activity, AlertTriangle, FileSearch, UploadCloud } from "lucide-react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -22,6 +24,7 @@ type LandingLoginProps = {
   users: DemoUser[];
   databaseError: string | null;
   chooseUser: (formData: FormData) => void | Promise<void>;
+  skipIntro?: boolean;
 };
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -51,32 +54,47 @@ export function LandingLogin({
   users,
   databaseError,
   chooseUser,
+  skipIntro = false,
 }: LandingLoginProps) {
+  const [introComplete, setIntroComplete] = useState(skipIntro);
+
+  useEffect(() => {
+    if (skipIntro) return;
+
+    const timer = window.setTimeout(() => setIntroComplete(true), 3_100);
+    return () => window.clearTimeout(timer);
+  }, [skipIntro]);
+
   return (
     <main className="min-h-screen overflow-hidden bg-zinc-950 text-white">
+      <AnimatePresence>
+        {!introComplete ? <BrandIntro /> : null}
+      </AnimatePresence>
+
       <motion.section
         className="mx-auto grid min-h-screen max-w-7xl items-stretch gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8"
         variants={container}
         initial="hidden"
-        animate="visible"
+        animate={introComplete ? "visible" : "hidden"}
       >
         <div className="flex flex-col justify-center">
-          <motion.div className="mb-8 flex items-center gap-3" variants={item}>
-            <motion.span
-              className="flex h-11 w-11 items-center justify-center rounded-lg bg-cyan-400 text-zinc-950"
-              whileHover={{ rotate: -6, scale: 1.04 }}
-              transition={{ type: "spring", stiffness: 320, damping: 18 }}
-            >
-              <ShieldCheck className="h-6 w-6" aria-hidden />
-            </motion.span>
+          <motion.div className="mb-10 flex items-center gap-5" variants={item}>
+            <Image
+              src="/brand/malviz-logo-concept.png"
+              alt="MalViz logo"
+              width={104}
+              height={104}
+              priority
+              className="rounded-3xl border border-cyan-400/35 shadow-[0_0_42px_rgba(34,211,238,0.22)]"
+            />
             <div>
-              <p className="text-base font-semibold">MalViz</p>
-              <p className="text-sm text-zinc-400">Explainable malware analysis</p>
+              <p className="text-5xl font-semibold leading-none text-cyan-300 sm:text-6xl">MalViz</p>
+              <p className="mt-3 text-lg text-zinc-300 sm:text-xl">Explainable malware analysis</p>
             </div>
           </motion.div>
 
           <motion.h1
-            className="max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-5xl"
+            className="max-w-2xl text-3xl font-semibold leading-tight text-white sm:text-4xl"
             variants={item}
           >
             Upload suspicious files and get clear, actionable verdicts.
@@ -181,6 +199,75 @@ export function LandingLogin({
         </motion.div>
       </motion.section>
     </main>
+  );
+}
+
+function BrandIntro() {
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 grid place-items-center bg-zinc-950"
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.45, ease: easeOut } }}
+    >
+      <div className="relative grid min-h-[min(86vh,760px)] w-full place-items-center px-4">
+        <motion.div
+          className="absolute h-[min(86vw,720px)] w-[min(86vw,720px)] rounded-full border border-cyan-400/25"
+          initial={{ scale: 0.72, opacity: 0 }}
+          animate={{
+            scale: [0.72, 1, 1.08],
+            opacity: [0, 0.42, 0],
+          }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: easeOut }}
+        />
+        <motion.div
+          className="absolute h-[min(74vw,620px)] w-[min(74vw,620px)] rounded-full border border-cyan-500/45"
+          initial={{ opacity: 0, rotate: 0 }}
+          animate={{ opacity: 1, rotate: 360 }}
+          transition={{ opacity: { delay: 0.6, duration: 0.7 }, rotate: { duration: 2.4, repeat: Infinity, ease: "linear" } }}
+        >
+          <span className="absolute left-1/2 top-1/2 h-1.5 w-[45%] origin-left -translate-y-1/2 bg-linear-to-r from-lime-300 via-lime-300/70 to-transparent shadow-[0_0_30px_rgba(163,230,53,0.75)]" />
+          <span className="absolute left-1/2 top-0 h-8 w-px -translate-x-1/2 bg-cyan-300" />
+          <span className="absolute bottom-0 left-1/2 h-8 w-px -translate-x-1/2 bg-cyan-300" />
+          <span className="absolute left-0 top-1/2 h-px w-8 -translate-y-1/2 bg-cyan-300" />
+          <span className="absolute right-0 top-1/2 h-px w-8 -translate-y-1/2 bg-cyan-300" />
+        </motion.div>
+        <motion.div
+          className="absolute h-[min(58vw,480px)] w-[min(58vw,480px)] rounded-full border border-cyan-400/20"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: [0.95, 1.02, 0.95] }}
+          transition={{ opacity: { delay: 0.75, duration: 0.5 }, scale: { duration: 2.8, repeat: Infinity, ease: easeOut } }}
+        >
+          <span className="absolute inset-x-8 top-1/2 h-px -translate-y-1/2 bg-cyan-400/15" />
+          <span className="absolute inset-y-8 left-1/2 w-px -translate-x-1/2 bg-cyan-400/15" />
+        </motion.div>
+
+        <motion.div
+          className="relative z-10 h-[min(48vw,410px)] w-[min(48vw,410px)] overflow-hidden rounded-[2rem] border border-cyan-300/40 bg-zinc-950 shadow-[0_0_90px_rgba(34,211,238,0.34)]"
+          initial={{ opacity: 0, scale: 0.86, filter: "blur(18px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          transition={{ duration: 1.35, ease: easeOut }}
+        >
+          <Image
+            src="/brand/malviz-logo-concept.png"
+            alt="MalViz logo"
+            fill
+            priority
+            sizes="(max-width: 900px) 48vw, 410px"
+            className="object-cover"
+          />
+        </motion.div>
+
+        <motion.div
+          className="absolute bottom-[clamp(1rem,4vh,3rem)] text-center"
+          initial={{ opacity: 0, y: 12, filter: "blur(14px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ delay: 1.15, duration: 1.2, ease: easeOut }}
+        >
+          <p className="text-4xl font-semibold tracking-normal text-white sm:text-5xl">MalViz</p>
+          <p className="mt-7 text-sm uppercase tracking-[0.3em] text-cyan-200">Threats in focus</p>
+        </motion.div>
+      </div>
+    </motion.div>
   );
 }
 

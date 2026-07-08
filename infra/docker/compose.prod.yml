@@ -1,0 +1,102 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-malviz}
+      POSTGRES_USER: ${POSTGRES_USER:-malviz}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in infra/docker/prod.env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-malviz} -d ${POSTGRES_DB:-malviz}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.web
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-malviz}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-malviz}?schema=public
+      REDIS_URL: redis://redis:6379
+      NEXT_TELEMETRY_DISABLED: "1"
+    command: sh -lc "bun run db:generate && bunx prisma migrate deploy --config config/prisma.config.ts && bun run db:seed && bunx tsx backend/scripts/db/verify-seed.ts"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.web
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-malviz}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-malviz}?schema=public
+      REDIS_URL: redis://redis:6379
+      APP_URL: ${APP_URL:?Set APP_URL in infra/docker/prod.env}
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-malviz_session}
+      MALVIZ_QUARANTINE_DIR: /quarantine
+      MALVIZ_AUTO_TRIGGER_WORKER: "false"
+      MALVIZ_DELETED_FILE_RETENTION_DAYS: ${MALVIZ_DELETED_FILE_RETENTION_DAYS:-7}
+      MAX_UPLOAD_SIZE_MB: ${MAX_UPLOAD_SIZE_MB:-25}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-26214400}
+      NEXT_TELEMETRY_DISABLED: "1"
+      NODE_ENV: production
+    volumes:
+      - quarantine-data:/quarantine
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.worker
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-malviz}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-malviz}?schema=public
+      REDIS_URL: redis://redis:6379
+      MALVIZ_QUARANTINE_DIR: /quarantine
+      WORKER_POLL_SECONDS: ${WORKER_POLL_SECONDS:-2}
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - quarantine-data:/quarantine
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      MALVIZ_SITE_ADDRESS: ${MALVIZ_SITE_ADDRESS:-:80}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/docker/Caddyfile.prod:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  quarantine-data:
+  caddy-data:
+  caddy-config:
