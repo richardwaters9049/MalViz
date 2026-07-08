@@ -6,14 +6,16 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # MalViz Project Notes
 
-MalViz is a local-first malware analysis MVP. It lets demo users upload suspicious files, stores raw bytes in quarantine storage outside the repository, creates scan jobs in PostgreSQL, and has a Python worker perform static analysis and write explainable reports.
+MalViz is a local-first malware intelligence platform foundation. It lets demo users upload suspicious files, stores raw bytes in quarantine storage outside the repository, creates generic artefact and analysis-request records, queues file scan jobs in PostgreSQL, and has a Python worker perform static analysis and write explainable reports.
 
 ## Current Architecture
 
 - Frontend: Next.js App Router 16, React 19, TypeScript, Tailwind CSS, local UI components, lucide-react icons.
 - Backend app layer: thin Next API routes under `frontend/src/app/api`, with business logic in `backend/lib`.
-- Database: PostgreSQL via Prisma. Scan jobs are queued in the `scan_jobs` table.
+- Shared contracts: platform contracts live under `shared/contracts` for artefacts, analysis requests, indicators, queue payloads, reports, findings, risk scores, and verdicts.
+- Database: PostgreSQL via Prisma. Artefacts, analysis requests, indicators, reports, threat-intelligence placeholder models, and audit logs live in PostgreSQL. File scan jobs are queued in the `scan_jobs` table.
 - Worker: Python static-analysis worker in `backend/worker/python`; it claims queued `scan_jobs` rows, reads quarantined files, runs plugins, scores findings, and writes reports.
+- Reports: completed scan reports can be downloaded as dark themed PDFs via `/api/scans/[id]/report.pdf`. PDF generation uses `backend/scripts/reports/render_report_pdf.py`, which follows the CV project pattern of generating Typst from Python and running `typst compile`.
 - Redis: upload rate-limit backing only. If Redis is unavailable, rate limiting falls back to in-memory local behavior. Do not reintroduce Redis/BullMQ as the scan queue without an explicit architecture decision.
 - Production demo hosting: Docker Compose stack in `infra/docker/compose.prod.yml` runs Caddy, Next.js, PostgreSQL, Redis, and the Python worker with shared persistent quarantine storage.
 - E2E: Playwright tests live in `e2e/` and use `config/playwright.config.ts`.
@@ -26,7 +28,19 @@ MalViz is a local-first malware analysis MVP. It lets demo users upload suspicio
 - Do not write uploaded bytes to `frontend/public`, the Git project, or synced folders.
 - Quarantine paths must stay under `MALVIZ_QUARANTINE_DIR`; original filenames are metadata only, while stored filenames are UUID-based.
 - Keep scan/report behavior explainable: verdicts should map back to visible reasons, indicators, matched rules, and technical findings.
+- Report exports must never include raw sample bytes or quarantine storage paths.
 - In production Docker, the web and worker containers must share the same `/quarantine` volume so queued scan jobs can read uploaded files.
+
+## Platform Direction
+
+MalViz is no longer architecturally centred only on files.
+
+- `File` remains the quarantine/storage record for uploaded bytes.
+- `Artefact` is the generic thing being analysed (`FILE`, `HASH`, `URL`, `DOMAIN`, `IP`, `EMAIL`, `ARCHIVE`).
+- `AnalysisRequest` is the platform request envelope above scan jobs.
+- Existing file scans create an artefact, an analysis request, and a PostgreSQL `scan_jobs` row.
+- Non-file artefact API requests are persisted for future worker/intelligence modules; they are not fully processed yet.
+- Threat intelligence models currently provide extension points only. Do not add external feed integrations unless explicitly requested.
 
 ## Auth And Roles
 
@@ -47,6 +61,7 @@ Do not treat this as production auth. Production work should replace it with rea
 - Production Docker settings are templated in `infra/docker/prod.env.example`; the real `infra/docker/prod.env` must stay private.
 - Caddy is the public entrypoint on ports `80` and `443`; do not expose the web, PostgreSQL, or Redis containers directly.
 - Production Compose sets `MALVIZ_AUTO_TRIGGER_WORKER=false`; the long-running worker polls PostgreSQL and the web container should not spawn local one-shot workers.
+- The production web image installs `python3` and `typst` because report PDF generation happens in the web container.
 - Keep this deployment framed as a portfolio demo. Do not present seeded demo auth as production-ready identity.
 
 ## Frontend And Branding Conventions
@@ -56,7 +71,17 @@ Do not treat this as production auth. Production work should replace it with rea
 - The post-intro landing layout should show the logo next to the left-side `MalViz` / `Explainable malware analysis` lockup. Do not put a duplicate logo inside the `Log in to MalViz` card header.
 - The compact `/sign-in` fallback page may use a larger static logo because it does not include the animated landing experience.
 - Desktop navigation lives in `frontend/src/components/layout/desktop-nav.tsx`; mobile navigation lives in `frontend/src/components/layout/mobile-menu.tsx`.
-- Active nav links should use a text/icon color mask with `var(--app-accent)`, not a filled accent background. Hover should stay lightweight and avoid dark filled backgrounds.
+- Buttons should consistently use `hover:bg-violet-600 hover:text-white`.
+- Active nav links should show the blue/cyan `var(--app-accent)` text/icon color at rest, not a filled accent background. On hover, active links should still follow the global violet background and white text button hover.
+- Download actions that generate server-side artifacts, such as `Download PDF`, should show an in-progress state with a spinner and clear feedback.
+
+## Report PDF Conventions
+
+- Keep PDF reports dark themed and aligned with the app palette: dark page background, dark cards, muted borders, cyan/violet accents, and verdict-specific risk colors.
+- Use the Python to Typst approach from `CV_Examples`: build a `.typ` template in Python, then run `typst compile`.
+- Keep the template in `backend/scripts/reports/render_report_pdf.py` unless there is a clear reason to split it.
+- Visually verify PDF layout after meaningful template changes by rendering to PNG with `pdftoppm` and checking for clipping, overflow, contrast issues, and table readability.
+- PDF exports should be shareable outside the app but should contain report data only, never uploaded sample bytes.
 
 ## Useful Commands
 
