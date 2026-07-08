@@ -50,6 +50,7 @@ export function FeedbackForm({ fileId }: { fileId: string }) {
   return (
     <div className="space-y-3">
       <select
+        aria-label="Feedback label"
         value={label}
         onChange={(event) => setLabel(event.currentTarget.value)}
         className="h-10 w-full rounded-md border border-(--app-border) bg-(--app-surface) px-3 text-sm text-(--app-fg) shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"

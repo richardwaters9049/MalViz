@@ -36,7 +36,7 @@ export function AdminReviewPanel({ files }: { files: ReviewFile[] }) {
   return (
     <div className="grid gap-4">
       {files.map((file) => (
-        <Card key={file.id}>
+        <Card key={file.id} data-testid={`admin-review-file-${file.id}`}>
           <CardHeader className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
             <div className="min-w-0">
               <CardTitle className="break-all">{file.originalFilename}</CardTitle>

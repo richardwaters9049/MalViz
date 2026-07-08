@@ -6,7 +6,6 @@ export type ServiceErrorCode =
   | "RATE_LIMITED"
   | "VALIDATION_FAILED"
   | "STORAGE_FAILED"
-  | "QUEUE_FAILED"
   | "MALFORMED_JSON";
 
 const statusByCode: Record<ServiceErrorCode, number> = {
@@ -17,7 +16,6 @@ const statusByCode: Record<ServiceErrorCode, number> = {
   RATE_LIMITED: 429,
   VALIDATION_FAILED: 422,
   STORAGE_FAILED: 500,
-  QUEUE_FAILED: 503,
   MALFORMED_JSON: 400,
 };
 

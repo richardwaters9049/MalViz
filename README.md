@@ -16,6 +16,7 @@ It is intentionally conservative: uploaded samples are never executed, raw file 
 | [Prerequisites](#prerequisites) | Tools needed for local development. |
 | [Environment](#environment) | Required configuration values. |
 | [How To Run](#how-to-run) | One-command, Docker, and manual setup options. |
+| [Demo Login Options](#demo-login-options) | How seeded demo authentication works. |
 | [How To Use The Programme](#how-to-use-the-programme) | Uploading, scanning, reviewing, and administering files. |
 | [Testing And Verification](#testing-and-verification) | Commands for checking the project. |
 | [Security Notes](#security-notes) | Safety boundaries for handling suspicious files. |
@@ -57,10 +58,8 @@ User
      -> indicators
      -> feedback
      -> audit logs
-  -> Redis / BullMQ
-     -> upload-side queue signal
   -> Python worker
-     -> claims queued jobs
+     -> claims queued scan_jobs rows
      -> reads quarantined files
      -> runs static-analysis plugins
      -> scores findings
@@ -69,7 +68,7 @@ User
      -> displays status, verdict, score, reasons, indicators, and actions
 ```
 
-Next.js is responsible for the user experience, authentication, upload validation, metadata storage, manual scan queueing, and report display. The Python worker is responsible for file analysis.
+Next.js is responsible for the user experience, authentication, upload validation, metadata storage, creating PostgreSQL-backed scan jobs, and report display. The Python worker is responsible for claiming queued scan jobs and performing file analysis.
 
 Raw uploaded files are written to `MALVIZ_QUARANTINE_DIR`, not to the application repository, not to `frontend/public`, and not to PostgreSQL.
 
@@ -82,10 +81,11 @@ Raw uploaded files are written to `MALVIZ_QUARANTINE_DIR`, not to the applicatio
 | Package/runtime | Bun |
 | Database | PostgreSQL |
 | ORM | Prisma |
-| Queue signal | Redis and BullMQ |
+| Scan queue | PostgreSQL `scan_jobs` table |
+| Rate-limit cache | Redis when available, in-memory fallback locally |
 | Worker | Python 3 |
 | Worker tests | pytest |
-| Frontend/backend tests | Vitest, TypeScript, ESLint |
+| Frontend/backend tests | Vitest, Playwright, TypeScript, ESLint |
 | Local services | Docker Compose |
 
 Docker Compose maps local services to non-default ports to avoid common conflicts:
@@ -198,6 +198,7 @@ Notes:
 - Keep `.env.example` committed.
 - `MAX_UPLOAD_SIZE_MB` is preferred.
 - `MAX_UPLOAD_BYTES` remains supported for compatibility.
+- `REDIS_URL` is used for upload rate limiting only; scan jobs are queued in PostgreSQL.
 - `MALVIZ_QUARANTINE_DIR` should point outside the Git project.
 - Do not use `frontend/public`, the project directory, or any synced folder for quarantine storage.
 
@@ -288,6 +289,24 @@ Start the worker in another terminal:
 bun run worker:python
 ```
 
+## Demo Login Options
+
+MalViz currently uses seeded demo identities instead of passwords, OAuth, or external identity providers. This keeps the MVP focused on upload safety, scan workflow, admin review, and report quality while still exercising role-based access control.
+
+There are two ways to log in:
+
+| Option | Route | Purpose |
+| --- | --- | --- |
+| Main landing login | `/` | The normal entry point. It shows the product context, seeded demo identities, and a continue button when a session already exists. |
+| Compact role chooser | `/sign-in` | A plain fallback login page for direct navigation, testing, and recovery when you want to switch or reselect a demo role without the landing experience. |
+
+Seeded demo roles:
+
+- `Demo Analyst` (`USER`) can upload files, start scans, view their own scan history, and open reports.
+- `Demo Admin` (`ADMIN`) can see all scans, access `/admin`, and leave review feedback on suspicious, malicious, unknown, or failed scans.
+
+The selected user id is stored in the `malviz_session` cookie, or the name configured by `SESSION_COOKIE_NAME`. This is intentionally lightweight development auth; do not treat it as production authentication. Before production, replace it with a real identity provider or password-backed auth, session hardening, and proper user management.
+
 ## How To Use The Programme
 
 1. Open [http://localhost:3000](http://localhost:3000).
@@ -330,6 +349,15 @@ bunx prisma validate --config config/prisma.config.ts
 bun run build
 ```
 
+Run browser UI coverage after local services are running, migrations are applied, demo users are seeded, and the Python worker is available:
+
+```bash
+bunx playwright install
+bun run test:e2e
+```
+
+The Playwright suite covers file upload, scan start/polling/report display, mobile navigation, and admin feedback.
+
 Manual acceptance checks:
 
 - Upload `backend/tests/fixtures/samples/clean-note.txt` and confirm it receives a low-risk result.
@@ -364,19 +392,17 @@ MalViz currently has:
 
 - thin API routes backed by service modules
 - external quarantine storage
-- PostgreSQL metadata and structured reports
-- Redis/BullMQ scan queue signalling from the manual scan action
+- PostgreSQL metadata, scan queue, and structured reports
 - a Python static-analysis worker
 - modular worker plugins for hashing, file type detection, strings, entropy, and indicator extraction
 - explainable risk scoring
 - scan history and detail pages
 - admin review workflow
 - mobile navigation
-- TypeScript and Python test coverage for core logic
+- TypeScript, Python, and Playwright coverage for core workflows
 
 Remaining strategic work:
 
-- choose one authoritative queue source for production
 - add deeper file-format detectors for Office, PDF, archives, JavaScript, PowerShell, and PE files
-- add end-to-end UI automation
+- broaden Playwright data setup so e2e can create and isolate its own database state in CI
 - add richer scan filtering and pagination for larger datasets

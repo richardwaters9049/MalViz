@@ -4,6 +4,8 @@ Last reviewed: 2026-07-08
 
 ## Resolved In This Pass
 
+- PostgreSQL `scan_jobs` is now the explicit scan queue source; the BullMQ enqueue path and dependency were removed.
+- Playwright e2e coverage was added for upload/scan/report, mobile navigation, and admin feedback flows.
 - API route auth now returns JSON `401`/`403` errors instead of page redirects.
 - Upload, scan start, and admin feedback clients now handle structured and non-JSON failures more consistently.
 - Upload validation now uses stored byte length for size checks and falls back cleanly when upload limit env vars are invalid.
@@ -17,6 +19,5 @@ Last reviewed: 2026-07-08
 
 ## Remaining Strategic Work
 
-- **Worker queue source is split.** Next.js writes BullMQ jobs when a user starts a scan, while the Python worker claims PostgreSQL queued jobs for MVP reliability. Choose one authoritative queue source before production.
 - **File validation is intentionally shallow.** Add parser-specific plugins for Office, PDF, archive, JavaScript, and PowerShell when those detectors are prioritized.
-- **UI automation is still absent.** Add Playwright coverage for upload, scan polling, mobile navigation, and admin feedback flows.
+- **E2E data setup is still manual.** Playwright currently expects local services, seeded demo users, and a worker-capable environment. Add isolated database setup/teardown before relying on it in CI.

@@ -13,6 +13,8 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
 /.pytest_cache/
 /worker/python/.pytest_cache/
 /backend/worker/python/.pytest_cache/

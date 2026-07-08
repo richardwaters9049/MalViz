@@ -2,7 +2,6 @@ import { FileStatus, JobStatus, type Prisma } from "@prisma/client";
 import type { SessionUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { ServiceError } from "@/lib/services/errors";
-import { enqueueScanJob } from "@/lib/services/queue/scan-queue";
 import { triggerWorkerOnce } from "@/lib/services/worker/worker-trigger";
 
 const STALE_SCAN_MS = 2 * 60 * 1000;
@@ -181,22 +180,8 @@ export async function startScan(user: SessionUser, id: string) {
 
   const warnings = [...result.warnings];
 
-  // Redis is an acceleration path; PostgreSQL remains the durable queue for the Python worker.
-  try {
-    await enqueueScanJob({
-      scanJobId: result.scanJob.id,
-      fileId: result.file.id,
-      storagePath: result.file.storagePath,
-    });
-  } catch (queueError) {
-    warnings.push(
-      "Redis enqueue failed, but the scan job is queued in PostgreSQL for the Python worker.",
-    );
-    console.error("Failed to enqueue BullMQ scan job", queueError);
-  }
-
   if (result.shouldTriggerWorker) {
-    // In local development, kick a one-shot worker so users see reports without a daemon.
+    // scan_jobs is the durable queue; this only wakes a local one-shot worker.
     const trigger = triggerWorkerOnce();
     if (!trigger.triggered) {
       warnings.push(trigger.warning ?? "Scan worker could not be started automatically.");
