@@ -1,6 +1,12 @@
+<!-- markdownlint-disable MD033 MD041 -->
+<div align="center">
+
 # MalViz
 
 <img src="frontend/public/brand/malviz-logo-concept.png" alt="MalViz logo concept" width="280" />
+
+</div>
+<!-- markdownlint-enable MD033 MD041 -->
 
 MalViz is a local-first malware analysis MVP for safely uploading suspicious files, quarantining them outside the application repository, running static analysis in a Python worker, and presenting clear, explainable scan reports to users and administrators.
 
@@ -8,23 +14,23 @@ It is intentionally conservative: uploaded samples are never executed, raw file 
 
 ## Contents
 
-| Section | Description |
-| --- | --- |
-| [Project Aim](#project-aim) | What MalViz is trying to achieve. |
-| [Screenshots](#screenshots) | Where to view application screenshots. |
-| [Overview](#overview) | The main application flow and architecture. |
-| [Tech Stack](#tech-stack) | Frameworks, services, and runtime tools. |
-| [Expected Output](#expected-output) | What a completed scan report looks like. |
-| [Repository Structure](#repository-structure) | Where the important code lives. |
-| [Prerequisites](#prerequisites) | Tools needed for local development. |
-| [Environment](#environment) | Required configuration values. |
-| [How To Run](#how-to-run) | One-command, Docker, and manual setup options. |
-| [Free Online Hosting](#free-online-hosting) | How to deploy the portfolio demo on an Always Free VM. |
-| [Demo Login Options](#demo-login-options) | How seeded demo authentication works. |
+| Section                                               | Description                                              |
+| ----------------------------------------------------- | -------------------------------------------------------- |
+| [Project Aim](#project-aim)                           | What MalViz is trying to achieve.                        |
+| [Screenshots](#screenshots)                           | Where to view application screenshots.                   |
+| [Overview](#overview)                                 | The main application flow and architecture.              |
+| [Tech Stack](#tech-stack)                             | Frameworks, services, and runtime tools.                 |
+| [Expected Output](#expected-output)                   | What a completed scan report looks like.                 |
+| [Repository Structure](#repository-structure)         | Where the important code lives.                          |
+| [Prerequisites](#prerequisites)                       | Tools needed for local development.                      |
+| [Environment](#environment)                           | Required configuration values.                           |
+| [How To Run](#how-to-run)                             | One-command, Docker, and manual setup options.           |
+| [Free Online Hosting](#free-online-hosting)           | How to deploy the portfolio demo on an Always Free VM.   |
+| [Demo Login Options](#demo-login-options)             | How seeded demo authentication works.                    |
 | [How To Use The Programme](#how-to-use-the-programme) | Uploading, scanning, reviewing, and administering files. |
-| [Testing And Verification](#testing-and-verification) | Commands for checking the project. |
-| [Security Notes](#security-notes) | Safety boundaries for handling suspicious files. |
-| [Current Project Status](#current-project-status) | What is working now and what remains. |
+| [Testing And Verification](#testing-and-verification) | Commands for checking the project.                       |
+| [Security Notes](#security-notes)                     | Safety boundaries for handling suspicious files.         |
+| [Current Project Status](#current-project-status)     | What is working now and what remains.                    |
 
 ## Project Aim
 
@@ -82,20 +88,20 @@ Raw uploaded files are written to `MALVIZ_QUARANTINE_DIR`, not to the applicatio
 
 ## Tech Stack
 
-| Area | Technology |
-| --- | --- |
-| Web app | Next.js App Router 16, React 19, TypeScript |
-| Styling | Tailwind CSS, local UI components, lucide-react icons |
-| Package/runtime | Bun |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Scan queue | PostgreSQL `scan_jobs` table |
-| Rate-limit cache | Redis when available, in-memory fallback locally |
-| Worker | Python 3 |
-| Worker tests | pytest |
-| Frontend/backend tests | Vitest, Playwright, TypeScript, ESLint |
-| Local services | Docker Compose |
-| Portfolio hosting | Docker Compose production stack with Caddy |
+| Area                   | Technology                                            |
+| ---------------------- | ----------------------------------------------------- |
+| Web app                | Next.js App Router 16, React 19, TypeScript           |
+| Styling                | Tailwind CSS, local UI components, lucide-react icons |
+| Package/runtime        | Bun                                                   |
+| Database               | PostgreSQL                                            |
+| ORM                    | Prisma                                                |
+| Scan queue             | PostgreSQL `scan_jobs` table                          |
+| Rate-limit cache       | Redis when available, in-memory fallback locally      |
+| Worker                 | Python 3                                              |
+| Worker tests           | pytest                                                |
+| Frontend/backend tests | Vitest, Playwright, TypeScript, ESLint                |
+| Local services         | Docker Compose                                        |
+| Portfolio hosting      | Docker Compose production stack with Caddy            |
 
 Docker Compose maps local services to non-default ports to avoid common conflicts:
 
@@ -344,13 +350,13 @@ Use the full guide here:
 
 Production hosting files:
 
-| File | Purpose |
-| --- | --- |
-| `infra/docker/compose.prod.yml` | Full production stack for web, worker, database, Redis, and Caddy. |
-| `infra/docker/Dockerfile.web` | Builds the Next.js production application image. |
-| `infra/docker/Dockerfile.worker` | Builds the Python scan worker image. |
-| `infra/docker/Caddyfile.prod` | Reverse proxy and automatic HTTPS configuration. |
-| `infra/docker/prod.env.example` | Template for private production settings. |
+| File                             | Purpose                                                            |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `infra/docker/compose.prod.yml`  | Full production stack for web, worker, database, Redis, and Caddy. |
+| `infra/docker/Dockerfile.web`    | Builds the Next.js production application image.                   |
+| `infra/docker/Dockerfile.worker` | Builds the Python scan worker image.                               |
+| `infra/docker/Caddyfile.prod`    | Reverse proxy and automatic HTTPS configuration.                   |
+| `infra/docker/prod.env.example`  | Template for private production settings.                          |
 
 For a real domain, set `APP_URL=https://your-domain.example` and `MALVIZ_SITE_ADDRESS=your-domain.example` in `infra/docker/prod.env`. Caddy will request HTTPS certificates automatically after DNS points to the VM.
 
@@ -358,16 +364,16 @@ For a temporary HTTP-only demo by IP address, set `APP_URL=http://YOUR_VM_PUBLIC
 
 Important production variables:
 
-| Variable | Purpose |
-| --- | --- |
-| `POSTGRES_PASSWORD` | Long random database password used by the internal PostgreSQL service. |
-| `DATABASE_URL` | Built by Compose for app containers from the PostgreSQL settings. |
-| `REDIS_URL` | Set to `redis://redis:6379` inside the Docker network. |
-| `APP_URL` | Public URL used by the app. |
-| `SESSION_COOKIE_NAME` | Session cookie name, defaulting to `malviz_session`. |
-| `MALVIZ_QUARANTINE_DIR` | Set to `/quarantine` inside app and worker containers. |
-| `MALVIZ_AUTO_TRIGGER_WORKER` | Set to `false` in production Compose because the worker polls continuously. |
-| `MAX_UPLOAD_SIZE_MB` / `MAX_UPLOAD_BYTES` | Upload size limits for the demo. |
+| Variable                                  | Purpose                                                                     |
+| ----------------------------------------- | --------------------------------------------------------------------------- |
+| `POSTGRES_PASSWORD`                       | Long random database password used by the internal PostgreSQL service.      |
+| `DATABASE_URL`                            | Built by Compose for app containers from the PostgreSQL settings.           |
+| `REDIS_URL`                               | Set to `redis://redis:6379` inside the Docker network.                      |
+| `APP_URL`                                 | Public URL used by the app.                                                 |
+| `SESSION_COOKIE_NAME`                     | Session cookie name, defaulting to `malviz_session`.                        |
+| `MALVIZ_QUARANTINE_DIR`                   | Set to `/quarantine` inside app and worker containers.                      |
+| `MALVIZ_AUTO_TRIGGER_WORKER`              | Set to `false` in production Compose because the worker polls continuously. |
+| `MAX_UPLOAD_SIZE_MB` / `MAX_UPLOAD_BYTES` | Upload size limits for the demo.                                            |
 
 Keep the online demo conservative: do not upload real malware, do not expose PostgreSQL or Redis publicly, and replace seeded demo auth before treating MalViz as a production application.
 
@@ -377,9 +383,9 @@ MalViz currently uses seeded demo identities instead of passwords, OAuth, or ext
 
 There are two ways to log in:
 
-| Option | Route | Purpose |
-| --- | --- | --- |
-| Main landing login | `/` | The normal entry point. It shows the product context, seeded demo identities, and a continue button when a session already exists. |
+| Option               | Route      | Purpose                                                                                                                                                  |
+| -------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Main landing login   | `/`        | The normal entry point. It shows the product context, seeded demo identities, and a continue button when a session already exists.                       |
 | Compact role chooser | `/sign-in` | A plain fallback login page for direct navigation, testing, and recovery when you want to switch or reselect a demo role without the landing experience. |
 
 Seeded demo roles:
@@ -404,15 +410,15 @@ The selected user id is stored in the `malviz_session` cookie, or the name confi
 
 Useful routes:
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Login / account selection |
-| `/dashboard` | Current scan overview |
-| `/upload` | Upload files for analysis |
-| `/scans` | Scan history |
-| `/scans/[id]` | Scan report details |
-| `/admin` | Admin review queue |
-| `/settings` | Account and runtime settings |
+| Route         | Purpose                      |
+| ------------- | ---------------------------- |
+| `/`           | Login / account selection    |
+| `/dashboard`  | Current scan overview        |
+| `/upload`     | Upload files for analysis    |
+| `/scans`      | Scan history                 |
+| `/scans/[id]` | Scan report details          |
+| `/admin`      | Admin review queue           |
+| `/settings`   | Account and runtime settings |
 
 The older `/results` routes redirect to `/scans` for compatibility.
 
