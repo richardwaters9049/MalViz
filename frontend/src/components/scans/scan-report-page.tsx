@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Clock, FileText, Hash } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
+import { DownloadReportButton } from "@/components/scans/download-report-button";
 import { ReportSections } from "@/components/scans/report-sections";
 import { RiskScoreCard } from "@/components/scans/risk-score-card";
 import { ScanNowButton } from "@/components/scans/scan-now-button";
@@ -40,6 +41,7 @@ export function ScanReportPage({ user, file }: { user: SessionUser; file: ScanDe
             <p className="mt-1 text-sm text-(--app-muted)">{verdictCopy(verdict)}</p>
           </div>
           <div className="flex flex-wrap gap-2">
+            {hasReport ? <DownloadReportButton fileId={file.id} /> : null}
             {verdict ? <VerdictBadge verdict={verdict} /> : <ScanStatusBadge status={file.status} />}
           </div>
         </div>

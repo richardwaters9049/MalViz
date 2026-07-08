@@ -2,19 +2,15 @@ import { redirect } from "next/navigation";
 import type { Role } from "@prisma/client";
 import { LandingLogin } from "@/components/landing/landing-login";
 import { prisma } from "@/lib/db/prisma";
-import { getCurrentUser, setSession } from "@/lib/auth/session";
+import { getCurrentUser, setSession, shouldSkipLandingIntro } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
-export default async function LandingPage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ skipIntro?: string }>;
-}) {
+export default async function LandingPage() {
   let currentUser = null;
   let users: Array<{ id: string; email: string; name: string; role: Role }> = [];
   let databaseError: string | null = null;
-  const params = await searchParams;
+  const skipIntro = await shouldSkipLandingIntro();
 
   try {
     currentUser = await getCurrentUser();
@@ -49,7 +45,7 @@ export default async function LandingPage({
       users={users}
       databaseError={databaseError}
       chooseUser={chooseUser}
-      skipIntro={params?.skipIntro === "1"}
+      skipIntro={skipIntro}
     />
   );
 }

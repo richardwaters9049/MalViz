@@ -28,6 +28,7 @@ type LandingLoginProps = {
 };
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
+const landingIntroCookieName = "malviz_skip_intro";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -59,7 +60,10 @@ export function LandingLogin({
   const [introComplete, setIntroComplete] = useState(skipIntro);
 
   useEffect(() => {
-    if (skipIntro) return;
+    if (skipIntro) {
+      document.cookie = `${landingIntroCookieName}=; Max-Age=0; Path=/; SameSite=Lax`;
+      return;
+    }
 
     const timer = window.setTimeout(() => setIntroComplete(true), 3_100);
     return () => window.clearTimeout(timer);

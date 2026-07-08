@@ -6,6 +6,7 @@ import { ServiceError } from "@/lib/services/errors";
 
 export const sessionCookieName =
   process.env.SESSION_COOKIE_NAME ?? "malviz_session";
+export const landingIntroCookieName = "malviz_skip_intro";
 
 export type SessionUser = Pick<User, "id" | "email" | "name" | "role">;
 
@@ -77,4 +78,19 @@ export async function setSession(userId: string) {
 export async function clearSession() {
   const cookieStore = await cookies();
   cookieStore.delete(sessionCookieName);
+}
+
+export async function skipLandingIntroOnce() {
+  const cookieStore = await cookies();
+  cookieStore.set(landingIntroCookieName, "1", {
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60,
+  });
+}
+
+export async function shouldSkipLandingIntro() {
+  const cookieStore = await cookies();
+  return cookieStore.get(landingIntroCookieName)?.value === "1";
 }

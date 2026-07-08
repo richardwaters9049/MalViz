@@ -37,7 +37,7 @@ Authentication is intentionally lightweight MVP auth using seeded demo identitie
 - `Demo Analyst` (`USER`) can upload files, start scans, view their own scans, and open reports.
 - `Demo Admin` (`ADMIN`) can see all scans, access `/admin`, and leave review feedback.
 - The session is stored in the `malviz_session` cookie unless `SESSION_COOKIE_NAME` overrides it.
-- Logout redirects to `/?skipIntro=1` so the landing page does not replay the brand intro animation after a user signs out.
+- Logout redirects to `/` and uses a short-lived cookie to skip the brand intro animation after a user signs out.
 
 Do not treat this as production auth. Production work should replace it with real identity, hardened sessions, and user management.
 

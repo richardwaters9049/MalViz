@@ -122,6 +122,7 @@ The active worker queue remains PostgreSQL `scan_jobs`; Redis is still upload-ra
 | Scan queue             | PostgreSQL `scan_jobs` table                          |
 | Rate-limit cache       | Redis when available, in-memory fallback locally      |
 | Worker                 | Python 3                                              |
+| PDF exports            | Python-generated Typst reports                       |
 | Worker tests           | pytest                                                |
 | Frontend/backend tests | Vitest, Playwright, TypeScript, ESLint                |
 | Local services         | Docker Compose                                        |
@@ -149,6 +150,7 @@ Users should expect to see:
 - matched rules
 - technical findings JSON
 - analysis metadata, including plugin results and non-fatal plugin errors
+- downloadable PDF export for sharing a report without access to the application
 
 Example report content:
 
@@ -169,7 +171,7 @@ Suggested actions:
 - Review the listed reasons and indicators.
 ```
 
-The report is intentionally explainable. MalViz should not claim a file is malicious without showing why.
+The report is intentionally explainable. MalViz should not claim a file is malicious without showing why. PDF exports include report metadata and findings, but never include raw sample bytes or quarantine storage paths.
 
 ## Repository Structure
 

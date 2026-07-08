@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { DesktopNav } from "@/components/layout/desktop-nav";
 import { cn } from "@/lib/utils";
-import { clearSession, type SessionUser } from "@/lib/auth/session";
+import { clearSession, skipLandingIntroOnce, type SessionUser } from "@/lib/auth/session";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", iconName: "LayoutDashboard" },
@@ -35,7 +35,8 @@ export function AppShell({
     "use server";
 
     await clearSession();
-    redirect("/?skipIntro=1");
+    await skipLandingIntroOnce();
+    redirect("/");
   }
 
   return (
