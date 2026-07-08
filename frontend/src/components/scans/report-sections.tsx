@@ -9,6 +9,7 @@ type Indicator = {
   type: string;
   value: string;
   source: string;
+  confidence?: number;
 };
 
 export function ReportSections({

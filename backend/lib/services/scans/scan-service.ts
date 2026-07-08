@@ -1,6 +1,10 @@
-import { FileStatus, JobStatus, type Prisma } from "@prisma/client";
+import { AnalysisRequestStatus, FileStatus, JobStatus, type Prisma } from "@prisma/client";
 import type { SessionUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
+import {
+  markAnalysisRequestStatus,
+  queueFileAnalysisRequest,
+} from "@/lib/services/analysis/analysis-service";
 import { ServiceError } from "@/lib/services/errors";
 import { triggerWorkerOnce } from "@/lib/services/worker/worker-trigger";
 
@@ -98,6 +102,8 @@ export async function startScan(user: SessionUser, id: string) {
           },
         });
 
+        await markAnalysisRequestStatus(tx, scanJob.analysisRequestId, AnalysisRequestStatus.QUEUED);
+
         await tx.file.update({
           where: { id: file.id },
           data: { status: FileStatus.QUEUED },
@@ -111,6 +117,7 @@ export async function startScan(user: SessionUser, id: string) {
             entityId: file.id,
             metadata: {
               scanJobId: scanJob.id,
+              analysisRequestId: scanJob.analysisRequestId,
               reason: "stale_scanning_job",
             } satisfies Prisma.InputJsonValue,
           },
@@ -144,11 +151,11 @@ export async function startScan(user: SessionUser, id: string) {
       );
     }
 
-    const scanJob = await tx.scanJob.create({
-      data: {
-        fileId: file.id,
-        status: JobStatus.QUEUED,
-      },
+    const queued = await queueFileAnalysisRequest({
+      tx,
+      file,
+      user,
+      source: "manual_scan_button",
     });
 
     await tx.file.update({
@@ -163,15 +170,15 @@ export async function startScan(user: SessionUser, id: string) {
         entityType: "file",
         entityId: file.id,
         metadata: {
-          scanJobId: scanJob.id,
-          source: "manual_scan_button",
+          scanJobId: queued.scanJob.id,
+          ...queued.auditMetadata,
         } satisfies Prisma.InputJsonValue,
       },
     });
 
     return {
       file,
-      scanJob,
+      scanJob: queued.scanJob,
       created: true,
       shouldTriggerWorker: true,
       warnings: [] as string[],

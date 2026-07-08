@@ -53,7 +53,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-      className="border-(--app-border) bg-(--app-surface) text-(--app-fg) hover:bg-(--app-surface-muted)"
+      className="border-(--app-border) bg-(--app-surface) text-(--app-fg)"
     >
       {theme === "dark" ? <Sun className="h-4 w-4" aria-hidden /> : <Moon className="h-4 w-4" aria-hidden />}
       <span className="hidden sm:inline">{theme === "dark" ? "Light" : "Dark"}</span>

@@ -70,13 +70,13 @@ export default async function SignInPage() {
                 key={user.id}
                 name="userId"
                 value={user.id}
-                className="flex w-full items-center justify-between rounded-md border border-zinc-200 bg-white p-4 text-left transition-colors hover:border-cyan-300 hover:bg-cyan-50"
+                className="group flex w-full items-center justify-between rounded-md border border-zinc-200 bg-white p-4 text-left transition-colors hover:border-violet-600 hover:bg-violet-600 hover:text-white"
               >
                 <span>
-                  <span className="block text-sm font-medium text-zinc-950">{user.name}</span>
-                  <span className="block text-xs text-zinc-500">{user.email}</span>
+                  <span className="block text-sm font-medium text-zinc-950 group-hover:text-white">{user.name}</span>
+                  <span className="block text-xs text-zinc-500 group-hover:text-white/85">{user.email}</span>
                 </span>
-                <span className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs font-medium text-zinc-700">
+                <span className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs font-medium text-zinc-700 group-hover:border-white/40 group-hover:bg-violet-700 group-hover:text-white">
                   {user.role === Role.ADMIN ? "Admin" : "User"}
                 </span>
               </button>

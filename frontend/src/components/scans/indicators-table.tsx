@@ -6,6 +6,7 @@ type Indicator = {
   type: string;
   value: string;
   source: string;
+  confidence?: number;
 };
 
 export function IndicatorsTable({ indicators }: { indicators: Indicator[] }) {
@@ -20,6 +21,7 @@ export function IndicatorsTable({ indicators }: { indicators: Indicator[] }) {
           <tr>
             <th className="px-4 py-3">Type</th>
             <th className="px-4 py-3">Value</th>
+            <th className="px-4 py-3">Confidence</th>
             <th className="px-4 py-3">Source</th>
           </tr>
         </thead>
@@ -32,6 +34,7 @@ export function IndicatorsTable({ indicators }: { indicators: Indicator[] }) {
               <td className="max-w-lg break-all px-4 py-3 font-mono text-xs text-(--app-fg)">
                 {indicator.value}
               </td>
+              <td className="px-4 py-3 text-(--app-muted)">{indicator.confidence ?? 50}%</td>
               <td className="px-4 py-3 text-(--app-muted)">{indicator.source}</td>
             </tr>
           ))}

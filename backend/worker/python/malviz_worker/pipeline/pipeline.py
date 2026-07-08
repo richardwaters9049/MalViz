@@ -21,6 +21,8 @@ class AnalysisPipeline:
             context.plugin_results.append(result.to_dict())
             context.findings[result.name] = result.findings
             context.add_indicators(result.indicators)
+            context.features[result.name] = result.features
+            context.add_relationships(result.relationships)
             context.errors.extend(result.errors)
 
         return context

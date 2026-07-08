@@ -132,7 +132,7 @@ export function ScanNowButton({ fileId, status }: ScanNowButtonProps) {
           onClick={startScan}
           disabled={!canStart}
           className={cn(
-            "relative min-w-36 overflow-hidden bg-cyan-600 text-white hover:bg-cyan-700",
+            "relative min-w-36 overflow-hidden bg-cyan-600 text-white",
             isActive && "bg-cyan-700",
           )}
         >

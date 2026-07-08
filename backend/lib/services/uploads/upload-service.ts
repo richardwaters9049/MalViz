@@ -3,6 +3,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { enforceRateLimit, uploadRateLimitKey } from "@/lib/security/rate-limit";
 import { inspectUpload } from "@/lib/security/file-validation";
+import { ensureFileArtefact } from "@/lib/services/analysis/analysis-service";
 import { ServiceError } from "@/lib/services/errors";
 import { removeQuarantineFile, writeQuarantineFile } from "@/lib/services/storage/quarantine-storage";
 import type { UploadFailure, UploadResult, UploadSuccess } from "@/lib/services/uploads/upload-types";
@@ -55,6 +56,8 @@ export async function handleUpload(request: Request, user: SessionUser): Promise
           },
         });
 
+        const artefact = await ensureFileArtefact(tx, fileRecord, user.id);
+
         await tx.auditLog.create({
           data: {
             userId: user.id,
@@ -62,6 +65,8 @@ export async function handleUpload(request: Request, user: SessionUser): Promise
             entityType: "file",
             entityId: fileRecord.id,
             metadata: {
+              artefactId: artefact.id,
+              artefactType: artefact.type,
               originalFilename: inspection.originalFilename,
               size: bytes.byteLength,
               warnings: inspection.warnings,

@@ -73,6 +73,14 @@ button:disabled,
   cursor: not-allowed;
 }
 
+.nav-link-button[data-active="true"] {
+  color: var(--app-accent);
+}
+
+.nav-link-button[data-active="true"]:hover {
+  color: #ffffff !important;
+}
+
 @keyframes scan-complete-reveal {
   from {
     opacity: 0;

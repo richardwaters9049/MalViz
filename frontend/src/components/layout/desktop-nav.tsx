@@ -35,9 +35,8 @@ export function DesktopNav({ navItems }: { navItems: NavItem[] }) {
             variant="ghost"
             size="sm"
             asChild
-            className={cn(
-              "hover:bg-transparent hover:!text-(--app-accent)",
-            )}
+            className={cn("nav-link-button hover:bg-violet-600 hover:text-white")}
+            data-active={isActive ? "true" : undefined}
           >
             <Link
               href={item.href}

@@ -23,6 +23,10 @@ def claim_job(conn: psycopg.Connection) -> dict[str, Any] | None:
             SELECT
               sj.id,
               sj.file_id,
+              sj.analysis_request_id,
+              ar.artefact_id,
+              ar.artefact_type,
+              ar.artefact_reference,
               f.storage_path,
               f.original_filename,
               f.stored_filename,
@@ -30,6 +34,7 @@ def claim_job(conn: psycopg.Connection) -> dict[str, Any] | None:
               f.file_size
             FROM scan_jobs sj
             JOIN files f ON f.id = sj.file_id
+            LEFT JOIN analysis_requests ar ON ar.id = sj.analysis_request_id
             WHERE sj.status = 'QUEUED'
             ORDER BY sj.created_at ASC
             FOR UPDATE SKIP LOCKED
@@ -52,12 +57,25 @@ def claim_job(conn: psycopg.Connection) -> dict[str, Any] | None:
             "UPDATE files SET status = 'SCANNING'::\"FileStatus\" WHERE id = %s",
             (row["file_id"],),
         )
+        if row.get("analysis_request_id"):
+            conn.execute(
+                """
+                UPDATE analysis_requests
+                SET status = 'SCANNING'::"AnalysisRequestStatus", updated_at = NOW()
+                WHERE id = %s
+                """,
+                (row["analysis_request_id"],),
+            )
         conn.execute(
             """
             INSERT INTO audit_logs (id, user_id, action, entity_type, entity_id, metadata, created_at)
             VALUES (%s, NULL, 'scan.started', 'file', %s, %s, NOW())
             """,
-            (str(uuid.uuid4()), row["file_id"], Jsonb({"scan_job_id": row["id"]})),
+            (
+                str(uuid.uuid4()),
+                row["file_id"],
+                Jsonb({"scan_job_id": row["id"], "analysis_request_id": row.get("analysis_request_id")}),
+            ),
         )
 
         return row
@@ -115,15 +133,23 @@ def write_success(
         for indicator in report.get("indicators", []):
             conn.execute(
                 """
-                INSERT INTO indicators (id, file_id, type, value, source, created_at)
-                VALUES (%s, %s, %s::"IndicatorType", %s, %s, NOW())
+                INSERT INTO indicators (
+                  id, file_id, artefact_id, analysis_request_id, type, value,
+                  confidence, source, description, metadata, created_at
+                )
+                VALUES (%s, %s, %s, %s, %s::"IndicatorType", %s, %s, %s, %s, %s, NOW())
                 """,
                 (
                     str(uuid.uuid4()),
                     file_id,
+                    raw_report.get("artefact", {}).get("artefact_id") if isinstance(raw_report, dict) else None,
+                    raw_report.get("analysis_request", {}).get("request_id") if isinstance(raw_report, dict) else None,
                     indicator["type"],
                     indicator["value"],
                     indicator["source"],
+                    int(indicator.get("confidence", 50)),
+                    indicator.get("description"),
+                    Jsonb(indicator.get("metadata", {})),
                 ),
             )
 
@@ -143,6 +169,16 @@ def write_success(
             """,
             (scan_job_id,),
         )
+        analysis_request_id = raw_report.get("analysis_request", {}).get("request_id") if isinstance(raw_report, dict) else None
+        if analysis_request_id:
+            conn.execute(
+                """
+                UPDATE analysis_requests
+                SET status = 'COMPLETED'::"AnalysisRequestStatus", completed_at = NOW(), updated_at = NOW()
+                WHERE id = %s
+                """,
+                (analysis_request_id,),
+            )
         conn.execute(
             """
             INSERT INTO audit_logs (id, user_id, action, entity_type, entity_id, metadata, created_at)
@@ -151,7 +187,14 @@ def write_success(
             (
                 str(uuid.uuid4()),
                 file_id,
-                Jsonb({"scan_job_id": scan_job_id, "verdict": verdict, "risk_score": int(report["risk_score"])}),
+                Jsonb(
+                    {
+                        "scan_job_id": scan_job_id,
+                        "analysis_request_id": analysis_request_id,
+                        "verdict": verdict,
+                        "risk_score": int(report["risk_score"]),
+                    }
+                ),
             ),
         )
 
@@ -172,6 +215,20 @@ def write_failure(conn: psycopg.Connection, scan_job_id: str, file_id: str, mess
             """,
             (message[:1000], scan_job_id),
         )
+        row = conn.execute(
+            "SELECT analysis_request_id FROM scan_jobs WHERE id = %s",
+            (scan_job_id,),
+        ).fetchone()
+        analysis_request_id = row.get("analysis_request_id") if row else None
+        if analysis_request_id:
+            conn.execute(
+                """
+                UPDATE analysis_requests
+                SET status = 'FAILED'::"AnalysisRequestStatus", completed_at = NOW(), updated_at = NOW()
+                WHERE id = %s
+                """,
+                (analysis_request_id,),
+            )
         conn.execute(
             """
             INSERT INTO scan_results (

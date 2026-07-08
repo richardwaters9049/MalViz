@@ -4,16 +4,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-sm font-medium transition-colors hover:bg-violet-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-zinc-950 text-white hover:bg-zinc-800",
-        secondary: "bg-[var(--app-surface-muted)] text-[var(--app-fg)] hover:opacity-90",
+        default: "bg-zinc-950 text-white",
+        secondary: "bg-[var(--app-surface-muted)] text-[var(--app-fg)]",
         outline:
-          "border border-[var(--app-border)] bg-[var(--app-surface)] text-[var(--app-fg)] hover:bg-[var(--app-surface-muted)]",
-        ghost: "text-[var(--app-fg)] hover:bg-[var(--app-surface-muted)]",
-        danger: "bg-red-600 text-white hover:bg-red-700",
+          "border border-[var(--app-border)] bg-[var(--app-surface)] text-[var(--app-fg)]",
+        ghost: "text-[var(--app-fg)]",
+        danger: "bg-red-600 text-white",
       },
       size: {
         default: "h-10 px-4",

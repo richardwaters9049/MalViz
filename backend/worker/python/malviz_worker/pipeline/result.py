@@ -9,7 +9,9 @@ class PluginResult:
     name: str
     version: str
     findings: dict[str, Any] = field(default_factory=dict)
-    indicators: list[dict[str, str]] = field(default_factory=list)
+    indicators: list[dict[str, Any]] = field(default_factory=list)
+    features: dict[str, Any] = field(default_factory=dict)
+    relationships: list[dict[str, Any]] = field(default_factory=list)
     score_adjustments: list[dict[str, Any]] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
@@ -20,6 +22,8 @@ class PluginResult:
             "version": self.version,
             "findings": self.findings,
             "indicators": self.indicators,
+            "features": self.features,
+            "relationships": self.relationships,
             "score_adjustments": self.score_adjustments,
             "metadata": self.metadata,
             "errors": self.errors,

@@ -21,6 +21,7 @@
     "paths": {
       "@/components/*": ["./frontend/src/components/*"],
       "@/lib/*": ["./backend/lib/*"],
+      "@/shared/*": ["./shared/*"],
       "@/*": ["./frontend/src/*"]
     }
   },
@@ -30,6 +31,7 @@
     "frontend/**/*.tsx",
     "backend/**/*.ts",
     "backend/**/*.tsx",
+    "shared/**/*.ts",
     "config/**/*.ts",
     "scripts/**/*.ts",
     ".next/types/**/*.ts",

@@ -167,7 +167,7 @@ export function LandingLogin({
                     key={user.id}
                     name="userId"
                     value={user.id}
-                    className="flex w-full cursor-pointer items-center justify-between rounded-md border border-zinc-700 bg-zinc-950/70 p-4 text-left transition-colors hover:border-cyan-300 hover:bg-zinc-800"
+                    className="group flex w-full cursor-pointer items-center justify-between rounded-md border border-zinc-700 bg-zinc-950/70 p-4 text-left transition-colors hover:border-violet-600 hover:bg-violet-600 hover:text-white"
                     initial={{ opacity: 0, x: 16 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.28 + index * 0.06 }}
@@ -176,9 +176,9 @@ export function LandingLogin({
                   >
                     <span>
                       <span className="block text-sm font-medium text-white">{user.name}</span>
-                      <span className="block text-xs text-zinc-400">{user.email}</span>
+                      <span className="block text-xs text-zinc-400 group-hover:text-white/85">{user.email}</span>
                     </span>
-                    <span className="rounded-md border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs font-medium text-zinc-300">
+                    <span className="rounded-md border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs font-medium text-zinc-300 group-hover:border-white/40 group-hover:bg-violet-700 group-hover:text-white">
                       {user.role === "ADMIN" ? "Admin" : "User"}
                     </span>
                   </motion.button>
@@ -190,7 +190,7 @@ export function LandingLogin({
                 </div>
               ) : null}
               {currentUser ? (
-                <Button className="mt-4 w-full bg-cyan-400 text-zinc-950 hover:bg-cyan-300" asChild>
+                <Button className="mt-4 w-full bg-cyan-400 text-zinc-950" asChild>
                   <a href="/dashboard">Continue to dashboard</a>
                 </Button>
               ) : null}

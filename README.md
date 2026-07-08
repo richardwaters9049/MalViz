@@ -8,7 +8,7 @@
 </div>
 <!-- markdownlint-enable MD033 MD041 -->
 
-MalViz is a local-first malware analysis MVP for safely uploading suspicious files, quarantining them outside the application repository, running static analysis in a Python worker, and presenting clear, explainable scan reports to users and administrators.
+MalViz is a local-first malware intelligence platform foundation for safely analysing suspicious artefacts, quarantining uploaded files outside the application repository, running static analysis in a Python worker, and presenting clear, explainable reports to users and administrators.
 
 It is intentionally conservative: uploaded samples are never executed, raw file bytes are not stored in PostgreSQL, and the Next.js app does not perform malware analysis itself.
 
@@ -19,6 +19,7 @@ It is intentionally conservative: uploaded samples are never executed, raw file 
 | [Project Aim](#project-aim)                           | What MalViz is trying to achieve.                        |
 | [Screenshots](#screenshots)                           | Where to view application screenshots.                   |
 | [Overview](#overview)                                 | The main application flow and architecture.              |
+| [Phase 3 Platform Foundation](#phase-3-platform-foundation) | Artefacts, analysis requests, intelligence models, and API shape. |
 | [Tech Stack](#tech-stack)                             | Frameworks, services, and runtime tools.                 |
 | [Expected Output](#expected-output)                   | What a completed scan report looks like.                 |
 | [Repository Structure](#repository-structure)         | Where the important code lives.                          |
@@ -34,7 +35,7 @@ It is intentionally conservative: uploaded samples are never executed, raw file 
 
 ## Project Aim
 
-The aim of MalViz is to provide a clean, secure, and extensible foundation for static malware analysis.
+The aim of MalViz is to provide a clean, secure, and extensible foundation for malware intelligence.
 
 The project focuses on:
 
@@ -42,6 +43,8 @@ The project focuses on:
 - quarantine storage outside the Git project
 - clear ownership boundaries between the web app and analysis worker
 - modular static-analysis plugins
+- generic artefact and analysis-request records
+- first-class indicators and future threat-intelligence relationships
 - explainable risk scoring
 - reports that are useful to non-specialists while still exposing technical detail
 - a codebase that can later support deeper detectors without a major rewrite
@@ -65,11 +68,18 @@ User
      -> scan and admin pages
      -> thin API routes
      -> service/security modules
+  -> Application services
+     -> artefacts
+     -> analysis requests
+     -> scan jobs
   -> PostgreSQL
      -> metadata
+     -> artefacts
+     -> analysis requests
      -> scan jobs
      -> scan results
      -> indicators
+     -> threat-intelligence models
      -> feedback
      -> audit logs
   -> Python worker
@@ -82,9 +92,22 @@ User
      -> displays status, verdict, score, reasons, indicators, and actions
 ```
 
-Next.js is responsible for the user experience, authentication, upload validation, metadata storage, creating PostgreSQL-backed scan jobs, and report display. The Python worker is responsible for claiming queued scan jobs and performing file analysis.
+Next.js is responsible for the user experience, authentication, upload validation, metadata storage, creating analysis requests and PostgreSQL-backed scan jobs, and report display. The Python worker is responsible for claiming queued scan jobs and performing file analysis.
 
 Raw uploaded files are written to `MALVIZ_QUARANTINE_DIR`, not to the application repository, not to `frontend/public`, and not to PostgreSQL.
+
+## Phase 3 Platform Foundation
+
+MalViz now includes platform-level models for:
+
+- artefacts: `FILE`, `HASH`, `URL`, `DOMAIN`, `IP`, `EMAIL`, and `ARCHIVE`
+- analysis requests with priority, requested modules, submitted user, and status
+- first-class indicators with value, type, confidence, source, description, and metadata
+- threat-intelligence placeholders for malware families, threat actors, campaigns, feeds, reputation, and IOC relationships
+- shared contracts under `shared/contracts`
+- versioned REST endpoints under `/api/v1`
+
+The active worker queue remains PostgreSQL `scan_jobs`; Redis is still upload-rate-limit backing only. See [Phase 3 Platform Architecture](docs/phase3-platform-architecture.md) for the current architecture and extension path.
 
 ## Tech Stack
 
@@ -95,6 +118,7 @@ Raw uploaded files are written to `MALVIZ_QUARANTINE_DIR`, not to the applicatio
 | Package/runtime        | Bun                                                   |
 | Database               | PostgreSQL                                            |
 | ORM                    | Prisma                                                |
+| Analysis model         | Artefacts, analysis requests, indicators, reports      |
 | Scan queue             | PostgreSQL `scan_jobs` table                          |
 | Rate-limit cache       | Redis when available, in-memory fallback locally      |
 | Worker                 | Python 3                                              |
@@ -120,6 +144,7 @@ Users should expect to see:
 - plain-English summary
 - reasons behind the score
 - extracted indicators, such as hashes, URLs, domains, IP addresses, emails, or suspicious commands
+- indicator source and confidence
 - suggested actions
 - matched rules
 - technical findings JSON
@@ -163,6 +188,9 @@ backend/
   scripts/             backend database and maintenance helpers
   tests/               TypeScript service tests and safe upload fixtures
   worker/python/       Python static-analysis worker, plugins, and pytest tests
+
+shared/
+  contracts/           Framework-neutral TypeScript contracts for platform APIs and reports
 
 e2e/
   *.spec.ts            Playwright coverage for upload, scan, admin feedback, and mobile navigation

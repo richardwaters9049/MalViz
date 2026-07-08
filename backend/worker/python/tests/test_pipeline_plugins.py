@@ -125,8 +125,10 @@ def test_risk_engine_and_report_are_explainable(tmp_path: Path) -> None:
 
     assert report["risk_score"] >= 25
     assert report["verdict"] == "SUSPICIOUS"
-    assert report["report_schema_version"] == 1
+    assert report["report_schema_version"] == 2
     assert report["reasons"]
+    assert report["raw_report_json"]["sections"]["risk_summary"]["verdict"] == "SUSPICIOUS"
+    assert report["raw_report_json"]["sections"]["evidence"]
     assert report["raw_report_json"]["plugin_results"]
 
 

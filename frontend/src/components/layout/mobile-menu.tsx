@@ -191,9 +191,8 @@ export function MobileMenu({ navItems, userName, userEmail, userRole, logoutActi
                     variant="ghost"
                     size="lg"
                     asChild
-                    className={cn(
-                      "h-12 justify-start text-base hover:bg-transparent hover:!text-(--app-accent)",
-                    )}
+                    className={cn("nav-link-button h-12 justify-start text-base hover:bg-violet-600 hover:text-white")}
+                    data-active={isActive ? "true" : undefined}
                     onClick={closeMenu}
                   >
                     <Link
