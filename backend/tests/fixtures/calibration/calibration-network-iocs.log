@@ -1,0 +1,13 @@
+MalViz calibration fixture: network indicator bundle.
+
+Observed in a harmless local test transcript:
+GET https://beacon.alpha.example.test/checkin
+POST http://payload-cache.example.invalid/stage-one
+DNS suspicious-host.example.test
+DNS telemetry-demo.example.invalid
+SRC 203.0.113.44
+DST 198.51.100.25
+CONTACT analyst@example.test
+
+All domains and addresses are reserved for documentation or invalid test use.
+

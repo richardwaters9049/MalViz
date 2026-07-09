@@ -21,6 +21,7 @@
     "db:generate": "prisma generate --config config/prisma.config.ts",
     "db:migrate": "prisma migrate dev --config config/prisma.config.ts",
     "db:seed": "tsx backend/prisma/seed.ts",
+    "db:seed:dataset": "tsx backend/scripts/db/seed-calibration-dataset.ts",
     "quarantine:prune": "tsx backend/scripts/maintenance/prune-quarantine.ts",
     "worker:python": "cd backend/worker/python && . .venv/bin/activate && python main.py"
   },
@@ -31,6 +32,7 @@
     "@radix-ui/react-slot": "^1.3.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "fflate": "^0.8.3",
     "file-type": "^22.0.1",
     "framer-motion": "^12.42.2",
     "ioredis": "^5.11.1",

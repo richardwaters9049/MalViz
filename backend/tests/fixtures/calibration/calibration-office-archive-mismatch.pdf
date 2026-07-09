@@ -1,0 +1,9 @@
+PK
+Harmless MalViz calibration fixture.
+
+This file starts with a ZIP/Office-style marker while using a PDF extension.
+It is useful for checking mismatch reporting without enough other evidence to
+cross the suspicious threshold.
+
+Expected result: clean score with an extension mismatch reason.
+

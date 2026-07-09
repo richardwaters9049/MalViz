@@ -319,6 +319,14 @@ bun run db:migrate --name init
 bun run db:seed
 ```
 
+Optionally seed the safe calibration dataset for repeatable scan testing:
+
+```bash
+bun run db:seed:dataset
+```
+
+The calibration dataset lives in `backend/tests/fixtures/calibration`. It contains inert clean, suspicious, and malicious-like fixtures with expected verdict metadata. The seed command copies those fixtures into quarantine storage, creates file artefacts and analysis requests, and queues scans for the worker.
+
 Create the Python worker environment:
 
 ```bash
@@ -430,8 +438,8 @@ The selected user id is stored in the `malviz_session` cookie, or the name confi
 1. Open [http://localhost:3000](http://localhost:3000).
 2. Choose one of the seeded demo users.
 3. Go to `/upload`.
-4. Upload one or more files.
-5. MalViz validates the file metadata, writes the bytes to quarantine storage, and stores metadata in PostgreSQL.
+4. Upload one or more files, or upload a ZIP archive containing multiple files.
+5. MalViz validates the file metadata, safely expands ZIP entries when needed, writes the bytes to quarantine storage, and stores metadata in PostgreSQL.
 6. Open the scan detail page and choose `Scan now` when you are ready to generate the report.
 7. The Python worker claims the queued job and runs static-analysis plugins.
 8. Go to `/scans` to view scan history.
@@ -478,8 +486,10 @@ The Playwright suite covers file upload, scan start/polling/report display, mobi
 
 Manual acceptance checks:
 
+- Run `bun run db:seed:dataset` and confirm the worker processes the calibration files into clean, suspicious, and malicious verdicts.
 - Upload `backend/tests/fixtures/samples/clean-note.txt` and confirm it receives a low-risk result.
 - Upload `backend/tests/fixtures/samples/suspicious-script.txt`, `backend/tests/fixtures/samples/network-indicators.log`, or `backend/tests/fixtures/samples/base64-heavy.txt` and confirm the report explains the suspicious signals.
+- Upload a ZIP containing multiple supported fixture files and confirm MalViz creates one quarantined file record per ZIP entry.
 - Confirm uploaded files are written under `MALVIZ_QUARANTINE_DIR`.
 - Confirm uploaded files are not written under `frontend/public` or the Git project.
 - Confirm non-admin users only see their own scans.

@@ -1,0 +1,9 @@
+MalViz calibration fixture: clean operations note.
+
+This file is intentionally boring. It describes a routine support handover,
+ticket ownership, and documentation updates. It avoids command execution
+phrases, URLs, IP addresses, encoded payload-looking strings, and binary
+headers.
+
+Expected result: clean or very low risk.
+

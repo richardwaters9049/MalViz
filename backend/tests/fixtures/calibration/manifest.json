@@ -1,0 +1,60 @@
+[
+  {
+    "filename": "calibration-clean-operations-note.txt",
+    "category": "clean",
+    "expectedVerdict": "CLEAN",
+    "expectedRules": [],
+    "description": "Plain operational note with no command, network, encoded, or executable signals."
+  },
+  {
+    "filename": "calibration-clean-settings.json",
+    "category": "clean",
+    "expectedVerdict": "CLEAN",
+    "expectedRules": [],
+    "mimeType": "application/json",
+    "description": "Benign JSON configuration-style data."
+  },
+  {
+    "filename": "calibration-network-iocs.log",
+    "category": "suspicious",
+    "expectedVerdict": "SUSPICIOUS",
+    "expectedRules": ["embedded_network_indicators"],
+    "description": "Network-only indicators using reserved test ranges and invalid/test domains."
+  },
+  {
+    "filename": "calibration-phishing-lure.txt",
+    "category": "suspicious",
+    "expectedVerdict": "SUSPICIOUS",
+    "expectedRules": ["embedded_network_indicators"],
+    "description": "Email-style lure text with URLs, domains, IPs, and sender indicators."
+  },
+  {
+    "filename": "calibration-webshell-js.js",
+    "category": "suspicious",
+    "expectedVerdict": "SUSPICIOUS",
+    "expectedRules": ["script_content", "suspicious_command_strings", "embedded_network_indicators"],
+    "description": "Harmless JavaScript text that mimics webshell command and callback strings."
+  },
+  {
+    "filename": "calibration-base64-loader.ps1",
+    "category": "malicious-like",
+    "expectedVerdict": "MALICIOUS",
+    "expectedRules": ["script_content", "suspicious_command_strings", "embedded_network_indicators", "base64_like_strings"],
+    "description": "Inert PowerShell-like loader text with command, network, and encoded-content signals."
+  },
+  {
+    "filename": "calibration-decoy-invoice.pdf.exe",
+    "category": "malicious-like",
+    "expectedVerdict": "MALICIOUS",
+    "expectedRules": ["extension_magic_mismatch", "executable_content", "suspicious_command_strings", "embedded_network_indicators"],
+    "description": "Text fixture beginning with MZ and using a double extension plus command/network strings."
+  },
+  {
+    "filename": "calibration-office-archive-mismatch.pdf",
+    "category": "edge-case",
+    "expectedVerdict": "CLEAN",
+    "expectedRules": ["extension_magic_mismatch"],
+    "description": "PK-prefixed archive-like text named as a PDF; highlights a low-scoring mismatch edge case."
+  }
+]
+

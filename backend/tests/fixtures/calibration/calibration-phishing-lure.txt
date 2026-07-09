@@ -1,0 +1,16 @@
+Subject: shared payroll document review
+From: payroll-review@example.test
+
+This harmless lure-style text is designed to exercise indicator extraction.
+It includes suspicious-looking infrastructure but no usable credential flow.
+
+Please review the staged document at:
+https://secure-review.example.test/session
+
+If unavailable, use:
+http://198.51.100.77/fallback
+
+Reference domains:
+login-review.example.test
+cdn-review.example.invalid
+

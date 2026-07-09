@@ -99,10 +99,10 @@ export function UploadDropzone({ maxBytes }: { maxBytes: number }) {
         <UploadCloud className="h-15 w-15 text-white" aria-hidden />
         <h2 className="mt-4 text-3xl font-semibold text-zinc-950">Drop suspicious files here</h2>
         <p className="mt-2 max-w-xl text-lg text-white">
-          Files are renamed, written to local quarantine storage, and never exposed through public routes.
+          Files and ZIP archives are unpacked safely, renamed, and written to local quarantine storage.
         </p>
         <p className="mt-2 max-w-xl text-lg text-white">
-          Maximum size is {formatBytes(maxBytes)} per file.
+          Maximum size is {formatBytes(maxBytes)} per file or ZIP entry.
         </p>
         <input
           ref={inputRef}

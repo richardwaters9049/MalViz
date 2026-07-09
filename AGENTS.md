@@ -27,6 +27,7 @@ MalViz is a local-first malware intelligence platform foundation. It lets demo u
 - Do not store raw file bytes in PostgreSQL.
 - Do not write uploaded bytes to `frontend/public`, the Git project, or synced folders.
 - Quarantine paths must stay under `MALVIZ_QUARANTINE_DIR`; original filenames are metadata only, while stored filenames are UUID-based.
+- ZIP uploads are expanded in memory into individual upload candidates. Never trust archive paths; reject traversal/absolute paths and keep extracted bytes under the same quarantine rules as direct uploads.
 - Keep scan/report behavior explainable: verdicts should map back to visible reasons, indicators, matched rules, and technical findings.
 - Report exports must never include raw sample bytes or quarantine storage paths.
 - In production Docker, the web and worker containers must share the same `/quarantine` volume so queued scan jobs can read uploaded files.
@@ -108,6 +109,7 @@ Do not treat this as production auth. Production work should replace it with rea
 - Prisma generate: `bun run db:generate`
 - Prisma migrate: `bun run db:migrate`
 - Seed demo users: `bun run db:seed`
+- Seed safe calibration dataset: `bun run db:seed:dataset`
 - Lint: `bun run lint`
 - Unit/service tests: `bun run test`
 - Python worker tests: `bun run test:python`
@@ -117,6 +119,8 @@ Do not treat this as production auth. Production work should replace it with rea
 - Render a report PDF directly when debugging templates: `python3 backend/scripts/reports/render_report_pdf.py --input <report-json> --out <report.pdf>`
 
 Playwright e2e requires local services, migrations, seeded demo users, Playwright browsers, and a worker-capable environment. Use `bunx playwright install` before first running e2e.
+
+The safe calibration dataset lives in `backend/tests/fixtures/calibration`. It is for repeatable rule/scoring validation only; do not replace it with real malware samples.
 
 ## Documentation Expectations
 

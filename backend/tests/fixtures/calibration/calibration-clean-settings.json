@@ -1,0 +1,16 @@
+{
+  "fixture": "calibration-clean-settings",
+  "purpose": "benign JSON parser and upload test",
+  "owner": "malviz-local-demo",
+  "settings": {
+    "scanMode": "static",
+    "retentionDays": 7,
+    "shareReports": true
+  },
+  "notes": [
+    "No network indicators are present.",
+    "No command execution strings are present.",
+    "No encoded payload-looking values are present."
+  ]
+}
+

