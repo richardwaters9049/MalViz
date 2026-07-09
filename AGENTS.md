@@ -42,6 +42,18 @@ MalViz is no longer architecturally centred only on files.
 - Non-file artefact API requests are persisted for future worker/intelligence modules; they are not fully processed yet.
 - Threat intelligence models currently provide extension points only. Do not add external feed integrations unless explicitly requested.
 
+## Current Implementation Map
+
+- Phase 3 shared contracts are exported from `shared/contracts/index.ts`.
+- The analysis orchestration service is `backend/lib/services/analysis/analysis-service.ts`.
+- Existing scan queue behavior is still owned by `backend/lib/services/scans/scan-service.ts` and the Python worker database adapter in `backend/worker/python/malviz_worker/db.py`.
+- Platform API entrypoints live under `frontend/src/app/api/v1`: analyse by artefact type, fetch reports, fetch artefacts, and fetch indicators.
+- Traditional file scan routes still live under `frontend/src/app/api/scans`.
+- PDF report downloads are served by `frontend/src/app/api/scans/[id]/report.pdf/route.ts`.
+- The client-side PDF download control is `frontend/src/components/scans/download-report-button.tsx`.
+- Logout and intro-skip cookie behavior is in `backend/lib/auth/session.ts`, `frontend/src/components/layout/app-shell.tsx`, and `frontend/src/components/landing/landing-login.tsx`.
+- Active nav color behavior is shared through `.nav-link-button` rules in `frontend/src/app/globals.css` plus the desktop/mobile nav components.
+
 ## Auth And Roles
 
 Authentication is intentionally lightweight MVP auth using seeded demo identities.
@@ -73,6 +85,7 @@ Do not treat this as production auth. Production work should replace it with rea
 - Desktop navigation lives in `frontend/src/components/layout/desktop-nav.tsx`; mobile navigation lives in `frontend/src/components/layout/mobile-menu.tsx`.
 - Buttons should consistently use `hover:bg-violet-600 hover:text-white`.
 - Active nav links should show the blue/cyan `var(--app-accent)` text/icon color at rest, not a filled accent background. On hover, active links should still follow the global violet background and white text button hover.
+- Avoid duplicate adjacent status/verdict badges. For example, the admin review panel should not show two `Suspicious` labels when status and verdict resolve to the same user-facing text.
 - Download actions that generate server-side artifacts, such as `Download PDF`, should show an in-progress state with a spinner and clear feedback.
 
 ## Report PDF Conventions
@@ -100,6 +113,8 @@ Do not treat this as production auth. Production work should replace it with rea
 - Python worker tests: `bun run test:python`
 - Production build: `bun run build`
 - Playwright e2e: `bun run test:e2e`
+- Check local PDF renderer availability: `python3 --version` and `typst --version`
+- Render a report PDF directly when debugging templates: `python3 backend/scripts/reports/render_report_pdf.py --input <report-json> --out <report.pdf>`
 
 Playwright e2e requires local services, migrations, seeded demo users, Playwright browsers, and a worker-capable environment. Use `bunx playwright install` before first running e2e.
 
