@@ -70,12 +70,11 @@ Do not treat this as production auth. Production work should replace it with rea
 
 ## Deployment Conventions
 
-- The recommended free public demo target is an Oracle Cloud Always Free Ubuntu VM running the production Docker stack.
 - Production Docker settings are templated in `infra/docker/prod.env.example`; the real `infra/docker/prod.env` must stay private.
 - Caddy is the public entrypoint on ports `80` and `443`; do not expose the web, PostgreSQL, or Redis containers directly.
 - Production Compose sets `MALVIZ_AUTO_TRIGGER_WORKER=false`; the long-running worker polls PostgreSQL and the web container should not spawn local one-shot workers.
 - The production web image installs `python3` and `typst` because report PDF generation happens in the web container.
-- Keep this deployment framed as a portfolio demo. Do not present seeded demo auth as production-ready identity.
+- Keep deployment guidance local-first. Do not present seeded demo auth as production-ready identity.
 
 ## Frontend And Branding Conventions
 

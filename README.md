@@ -26,7 +26,6 @@ It is intentionally conservative: uploaded samples are never executed, raw file 
 | [Prerequisites](#prerequisites)                       | Tools needed for local development.                      |
 | [Environment](#environment)                           | Required configuration values.                           |
 | [How To Run](#how-to-run)                             | One-command, Docker, and manual setup options.           |
-| [Free Online Hosting](#free-online-hosting)           | How to deploy the portfolio demo on an Always Free VM.   |
 | [Demo Login Options](#demo-login-options)             | How seeded demo authentication works.                    |
 | [How To Use The Programme](#how-to-use-the-programme) | Uploading, scanning, reviewing, and administering files. |
 | [Testing And Verification](#testing-and-verification) | Commands for checking the project.                       |
@@ -347,9 +346,9 @@ Start the worker in another terminal:
 bun run worker:python
 ```
 
-### Option 4: Production Docker stack
+### Option 4: Local Production-Like Docker Stack
 
-For an online portfolio demo, use the production Docker stack:
+To run the full stack locally in a production-like shape, use the Docker production compose file:
 
 ```bash
 cp infra/docker/prod.env.example infra/docker/prod.env
@@ -378,15 +377,7 @@ Follow logs with:
 bun run docker:prod:logs
 ```
 
-## Free Online Hosting
-
-The recommended free hosting path is an Oracle Cloud Always Free Ubuntu VM running the production Docker stack. This matches MalViz better than static or serverless hosting because the app needs PostgreSQL, Redis, shared quarantine storage, and a long-running Python worker.
-
-Use the full guide here:
-
-[docs/free-hosting-oracle.md](docs/free-hosting-oracle.md)
-
-Production hosting files:
+Production-like local Docker files:
 
 | File                             | Purpose                                                            |
 | -------------------------------- | ------------------------------------------------------------------ |
@@ -396,24 +387,22 @@ Production hosting files:
 | `infra/docker/Caddyfile.prod`    | Reverse proxy and automatic HTTPS configuration.                   |
 | `infra/docker/prod.env.example`  | Template for private production settings.                          |
 
-For a real domain, set `APP_URL=https://your-domain.example` and `MALVIZ_SITE_ADDRESS=your-domain.example` in `infra/docker/prod.env`. Caddy will request HTTPS certificates automatically after DNS points to the VM.
+For local use, set `APP_URL=http://localhost` and `MALVIZ_SITE_ADDRESS=:80` in `infra/docker/prod.env`.
 
-For a temporary HTTP-only demo by IP address, set `APP_URL=http://YOUR_VM_PUBLIC_IP` and `MALVIZ_SITE_ADDRESS=:80`.
-
-Important production variables:
+Important local stack variables:
 
 | Variable                                  | Purpose                                                                     |
 | ----------------------------------------- | --------------------------------------------------------------------------- |
 | `POSTGRES_PASSWORD`                       | Long random database password used by the internal PostgreSQL service.      |
 | `DATABASE_URL`                            | Built by Compose for app containers from the PostgreSQL settings.           |
 | `REDIS_URL`                               | Set to `redis://redis:6379` inside the Docker network.                      |
-| `APP_URL`                                 | Public URL used by the app.                                                 |
+| `APP_URL`                                 | Local URL used by the app.                                                  |
 | `SESSION_COOKIE_NAME`                     | Session cookie name, defaulting to `malviz_session`.                        |
 | `MALVIZ_QUARANTINE_DIR`                   | Set to `/quarantine` inside app and worker containers.                      |
 | `MALVIZ_AUTO_TRIGGER_WORKER`              | Set to `false` in production Compose because the worker polls continuously. |
-| `MAX_UPLOAD_SIZE_MB` / `MAX_UPLOAD_BYTES` | Upload size limits for the demo.                                            |
+| `MAX_UPLOAD_SIZE_MB` / `MAX_UPLOAD_BYTES` | Upload size limits.                                                         |
 
-Keep the online demo conservative: do not upload real malware, do not expose PostgreSQL or Redis publicly, and replace seeded demo auth before treating MalViz as a production application.
+Keep local testing conservative: do not upload real malware, do not expose PostgreSQL or Redis publicly, and replace seeded demo auth before treating MalViz as a production application.
 
 ## Demo Login Options
 
